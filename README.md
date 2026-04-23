@@ -32,7 +32,7 @@ El sistema se basa en 4 pilares fundamentales para evitar la redundancia:
 2.  **Customers (Clientes):** Directorio único basado en el `email`. Un cliente es único en el sistema, independientemente de cuántas veces contacte.
 3.  **Services (Servicios):** Catálogo de productos o clases ofrecidas.
 4.  **Interactions (Leads):** Registro histórico que une a un Cliente con un Origen y un Servicio específico.
-5.  **Service_source:** Tabla pivote para conectar servicios y sources 
+5.  **Service_source:** Tabla pivote para conectar servicios y sources. 
 
 ---
 
@@ -58,7 +58,7 @@ Si acabas de clonar el repositorio, sigue estos pasos:
    Crear usuario (si no existe): php artisan make:filament-user
 
 ## 📝 Próximos Pasos (Backlog)
-[ ] Creación de Migraciones para Sources, Customers y Services.
+[x] Creación y configuración de Migraciones para Sources, Customers, Services y Service_source.
 
 [ ] Implementación de la tabla de Interacciones (Leads).
 

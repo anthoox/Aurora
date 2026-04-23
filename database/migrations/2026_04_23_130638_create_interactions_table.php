@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('interactions', function (Blueprint $table) {
             $table->id();
+            // Relaciones con las otras tablas
+            $table->foreignId('customer_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('source_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('service_id')->nullable()->constrained('services')->nullOnDelete();
+
+            $table->string('status')->default('nuevo'); // nuevo, contactado, vendido, etc.
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }
