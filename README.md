@@ -60,9 +60,11 @@ Si acabas de clonar el repositorio, sigue estos pasos:
 ## 📝 Próximos Pasos (Backlog)
 [x] Creación y configuración de Migraciones para Sources, Customers, Services y Service_source.
 
-[ ] Implementación de la tabla de Interacciones (Leads).
+[x] Implementación de la tabla de Interacciones (Leads)(lanzar las migraciones).
 
-[ ] Generación de Recursos en Filament con --generate.
+[x] Generación de Recursos en Filament con --generate.
 
-[ ] Desarrollo de la API de recepción de datos con lógica de "No Duplicidad".
+[x] Creación y configuración de formularios de cada recurso.
+
+[x] Desarrollo de la API de recepción de datos con lógica de "No Duplicidad".
 

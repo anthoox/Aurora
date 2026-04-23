@@ -7,20 +7,25 @@ use Filament\Schemas\Schema;
 
 class CustomerForm
 {
+    // app/Filament/Resources/Customers/Schemas/CustomerForm.php
+
     public static function configure(Schema $schema): Schema
     {
         return $schema
             ->components([
-                TextInput::make('email')
-                    ->label('Email address')
-                    ->email()
-                    ->required(),
                 TextInput::make('first_name')
+                    ->label('Nombre')
                     ->required(),
-                TextInput::make('last_name'),
+                TextInput::make('last_name')
+                    ->label('Apellidos'),
+                TextInput::make('email')
+                    ->label('Correo Electrónico')
+                    ->email()
+                    ->required()
+                    ->unique(ignoreRecord: true), // Evita duplicar el mismo email
                 TextInput::make('phone')
+                    ->label('Teléfono')
                     ->tel(),
-                TextInput::make('metadata'),
             ]);
     }
 }

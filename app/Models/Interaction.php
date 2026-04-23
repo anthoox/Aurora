@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Interaction extends Model
 {
+    protected $fillable = ['customer_id', 'source_id', 'service_id', 'status', 'notes'];
 
     public function customer()
     {
