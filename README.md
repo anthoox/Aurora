@@ -69,4 +69,3 @@ Si acabas de clonar el repositorio, sigue estos pasos:
 [x] Instalación php artisan install api
 
 [x] Desarrollo de la API de recepción de datos con lógica de "No Duplicidad".
-
