@@ -66,5 +66,5 @@ Si acabas de clonar el repositorio, sigue estos pasos:
 
 [x] Creación y configuración de formularios de cada recurso.
 
-[x] Desarrollo de la API de recepción de datos con lógica de "No Duplicidad".
+[] Desarrollo de la API de recepción de datos con lógica de "No Duplicidad".
 
