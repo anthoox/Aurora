@@ -75,8 +75,8 @@ Si acabas de clonar el repositorio, sigue estos pasos:
 
 Sistema de avisos en tiempo real para la gestión inmediata de leads entrantes.
 
-- [ ] **Configuración de Database Notifications:** Habilitar el sistema de persistencia de notificaciones de Laravel.
-- [ ] **Trigger en LeadController:** Implementar el envío de notificaciones internas al recibir un lead exitoso por la API.
-- [ ] **Notificaciones en Panel:** Configurar el componente `DatabaseNotifications` de Filament para mostrar la "campanita" en el Header.
+- [x] **Configuración de Database Notifications:** Habilitar el sistema de persistencia de notificaciones de Laravel.
+- [x] **Trigger en LeadController:** Implementar el envío de notificaciones internas al recibir un lead exitoso por la API.
+- [x] **Notificaciones en Panel:** Configurar el componente `DatabaseNotifications` de Filament para mostrar la "campanita" en el Header.
 - [ ] **Alertas de Error:** Implementar avisos específicos para tokens inválidos o fuentes inactivas.
 - [ ] **(Extra) Sonido de Alerta:** Añadir un trigger sonoro opcional al recibir un nuevo registro.
