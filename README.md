@@ -57,15 +57,26 @@ Si acabas de clonar el repositorio, sigue estos pasos:
    URL: /admin
    Crear usuario (si no existe): php artisan make:filament-user
 
-## 📝 Próximos Pasos (Backlog)
-[x] Creación y configuración de Migraciones para Sources, Customers, Services y Service_source.
+# [ 📝 BACKLOG ]
+## 🦴 Fase: Estructura de recursos Filament. Configuración API 
+- [x] Creación y configuración de Migraciones para Sources, Customers, Services y Service_source.
 
-[x] Implementación de la tabla de Interacciones (Leads)(lanzar las migraciones).
+- [x] Implementación de la tabla de Interacciones (Leads)(lanzar las migraciones).
 
-[x] Generación de Recursos en Filament con --generate.
+- [x] Generación de Recursos en Filament con --generate.
 
-[x] Creación y configuración de formularios de cada recurso.
+- [x] Creación y configuración de formularios de cada recurso.
 
-[x] Instalación php artisan install api
+- [x] Instalación php artisan install api
 
-[x] Desarrollo de la API de recepción de datos con lógica de "No Duplicidad".
+- [x] Desarrollo de la API de recepción de datos con lógica de "No Duplicidad".
+
+## 🔔 Fase: Sistema de Notificaciones y Alertas
+
+Sistema de avisos en tiempo real para la gestión inmediata de leads entrantes.
+
+- [ ] **Configuración de Database Notifications:** Habilitar el sistema de persistencia de notificaciones de Laravel.
+- [ ] **Trigger en LeadController:** Implementar el envío de notificaciones internas al recibir un lead exitoso por la API.
+- [ ] **Notificaciones en Panel:** Configurar el componente `DatabaseNotifications` de Filament para mostrar la "campanita" en el Header.
+- [ ] **Alertas de Error:** Implementar avisos específicos para tokens inválidos o fuentes inactivas.
+- [ ] **(Extra) Sonido de Alerta:** Añadir un trigger sonoro opcional al recibir un nuevo registro.
