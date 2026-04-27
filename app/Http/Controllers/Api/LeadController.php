@@ -8,6 +8,9 @@ use App\Models\Interaction;
 use App\Models\Source;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Models\User;
+use Filament\Notifications\Notification;
+use Illuminate\Support\Str;
 
 class LeadController extends Controller
 {
@@ -19,6 +22,22 @@ class LeadController extends Controller
             ->first();
 
         if (!$source) {
+            $admin = User::find(1);
+            if ($admin) {
+                $notifData = Notification::make()
+                    ->title('Alerta de Seguridad: API')
+                    ->body('Intento de acceso con token inválido desde: ' . $request->ip())
+                    ->danger()
+                    ->icon('heroicon-o-shield-exclamation')
+                    ->getDatabaseMessage();
+
+                $admin->notifications()->create([
+                    'id' => Str::uuid()->toString(),
+                    'type' => 'Filament\Notifications\DatabaseNotification',
+                    'data' => $notifData['data'] ?? $notifData,
+                    'read_at' => null,
+                ]);
+            }
             return response()->json(['error' => 'No autorizado o fuente inactiva'], 401);
         }
 
@@ -30,6 +49,24 @@ class LeadController extends Controller
         ]);
 
         if ($validator->fails()) {
+
+            $admin = User::find(1);
+            if ($admin) {
+                $notifData = Notification::make()
+                    ->title('Error de Validación en Lead')
+                    ->body("La fuente '{$source->name}' envió datos incompletos.")
+                    ->warning()
+                    ->icon('heroicon-o-exclamation-triangle')
+                    ->getDatabaseMessage();
+
+                $admin->notifications()->create([
+                    'id' => Str::uuid()->toString(),
+                    'type' => 'Filament\Notifications\DatabaseNotification',
+                    'data' => $notifData['data'] ?? $notifData,
+                    'read_at' => null,
+                ]);
+            }
+
             return response()->json(['errors' => $validator->errors()], 422);
         }
 

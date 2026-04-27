@@ -23,7 +23,7 @@ class InteractionObserver
             try {
                 $notification = Notification::make()
                     ->title('¡Nuevo Lead!')
-                    ->body("Lead de: " . ($interaction->customer->first_name ?? 'Cliente'))
+                    ->body("Lead de: " . ($interaction->customer->first_name . ' (' . $interaction->customer->email . ')' ?? 'Cliente'))
                     ->success()
                     ->icon('heroicon-o-bell');
 
