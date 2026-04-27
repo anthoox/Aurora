@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Str;
+use Filament\Actions\Action;
 
 class LeadController extends Controller
 {
@@ -29,6 +30,12 @@ class LeadController extends Controller
                     ->body('Intento de acceso con token inválido desde: ' . $request->ip())
                     ->danger()
                     ->icon('heroicon-o-shield-exclamation')
+                    ->actions([
+                        Action::make('check_sources')
+                            ->label('Revisar Fuentes')
+                            ->url('/admin/sources') // Te lleva al listado general
+                            ->color('danger'),
+                    ])
                     ->getDatabaseMessage();
 
                 $admin->notifications()->create([
@@ -57,6 +64,12 @@ class LeadController extends Controller
                     ->body("La fuente '{$source->name}' envió datos incompletos.")
                     ->warning()
                     ->icon('heroicon-o-exclamation-triangle')
+                    ->actions([
+                        Action::make('fix_source')
+                            ->label('Ver Fuente')
+                            ->url("/admin/sources/{$source->id}/edit") // Te lleva directo a la fuente culpable
+                            ->color('warning'),
+                    ])
                     ->getDatabaseMessage();
 
                 $admin->notifications()->create([

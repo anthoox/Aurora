@@ -7,7 +7,7 @@ use App\Models\User;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Log; // Para que Log:: funcionen
 use Illuminate\Support\Str; 
-
+use Filament\Actions\Action;
 class InteractionObserver
 {
     /**
@@ -25,7 +25,13 @@ class InteractionObserver
                     ->title('¡Nuevo Lead!')
                     ->body("Lead de: " . ($interaction->customer->first_name . ' (' . $interaction->customer->email . ')' ?? 'Cliente'))
                     ->success()
-                    ->icon('heroicon-o-bell');
+                    ->icon('heroicon-o-bell')
+                    ->actions([
+                        Action::make('view')
+                            ->label('Ver Lead')
+                            ->url(fn() => "/admin/interactions/{$interaction->id}/edit")
+                            ->markAsRead(), // Opcional: marca como leída al clicar
+                    ]);
 
                 $message = $notification->getDatabaseMessage();
                 $dataToSave = isset($message['data']) ? $message['data'] : $message;
