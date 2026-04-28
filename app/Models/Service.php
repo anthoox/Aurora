@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 class Service extends Model
 {
     use HasFactory;
@@ -12,5 +13,14 @@ class Service extends Model
     public function sources()
     {
         return $this->belongsToMany(Source::class);
+    }
+
+
+    /**
+     * Las interacciones (leads) que han solicitado este servicio.
+     */
+    public function interactions(): HasMany
+    {
+        return $this->hasMany(Interaction::class);
     }
 }

@@ -79,3 +79,46 @@ Sistema de avisos en tiempo real para la gestión inmediata de leads entrantes.
 - [x] **Trigger en LeadController:** Implementar el envío de notificaciones internas al recibir un lead exitoso por la API.
 - [x] **Notificaciones en Panel:** Configurar el componente `DatabaseNotifications` de Filament para mostrar la "campanita" en el Header.
 - [x] **Alertas de Error:** Implementar avisos específicos para tokens inválidos o fuentes inactivas.
+
+📋 Hoja de Ruta: Funcionalidades Core de Aurora
+- [ ] **1. Vista de Consulta (Infolist)**
+Es: Una pantalla intermedia entre la lista y el formulario de edición.
+
+Funcion: Permite visualizar todos los datos del lead, notas y servicios contratados en un formato de "tarjetas" limpio, evitando modificar datos por error.
+
+Pasos: Usaremos la clase Infolist de Filament para organizar los campos de forma elegante.
+
+- [ ] **2. Gestión de Catálogo y Precios**
+Es: Un nuevo módulo de Servicios.
+
+Funcion: Para que cada web (Source) pueda tener sus propios servicios con descripción y precio.
+
+Pasos: Crearemos la tabla services vinculada a sources. Esto permitirá que, al entrar un lead de "Web A", solo puedas elegir servicios de esa web.
+
+- [ ] **3. Módulo de Reservas y Sincronización con Google Calendar**
+Es: El corazón del CRM. Una sección de Bookings (Citas).
+
+Funcion: Agendar el día y la hora de la prestación del servicio. Al guardar, se crea automáticamente el evento en tu Google Calendar y se le envía la invitación al correo del cliente.
+
+Pasos: Usaremos la API de Google y un "Observer" en Laravel que detecte cuando se crea una reserva para disparar la sincronización.
+
+- [ ] **4. Acción de "WhatsApp Rápido"**
+Es: Un botón dinámico en la ficha del lead.
+
+Funcion: Iniciar una conversación con un solo clic. Al pulsarlo, abre WhatsApp con el número del cliente y un mensaje como: "Hola [Nombre], te contacto desde [Web] por tu consulta sobre [Servicio]...".
+
+Pasos: Un botón de acción que construye una URL dinámica: https://wa.me/telefono?text=mensaje_codificado.
+
+- [ ] **5. Centro de Mensajería y Automatización de Estados**
+Es: Un historial de mensajes enviados desde Aurora.
+
+Funcion: Para que todo el equipo sepa qué se le ha dicho al cliente. Además, cuando envíes el primer mensaje, Aurora cambiará el estado a "Contactado" automáticamente. Al crear la reserva, el estado pasará a "Reservado".
+
+Pasos: Una tabla messages y lógica de eventos en Laravel que actualice el campo status de la interacción según la actividad.
+
+- [ ] **6. Sistema de Recordatorios de Seguimiento**
+Es: Alertas basadas en fechas.
+
+Funcion: Para que no se te "enfríe" ningún lead. Si un lead no ha pasado a reserva en 48h, aparecerá en una sección de "Pendientes de seguimiento".
+
+Pasos: Un filtro en el Dashboard que resalte las interacciones cuya updated_at sea antigua y sigan en estado "Contactado".
