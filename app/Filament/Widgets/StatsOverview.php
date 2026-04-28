@@ -7,7 +7,7 @@ use App\Models\Customer;
 use App\Models\Source;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-
+use Illuminate\Support\Carbon;
 
 class StatsOverview extends BaseWidget
 {
@@ -18,6 +18,10 @@ class StatsOverview extends BaseWidget
     protected int|string|array $columnSpan = 2;
     protected function getStats(): array
     {
+        $trendData = collect(range(6, 0))->map(function ($daysAgo) {
+            return Interaction::whereDate('created_at', Carbon::today()->subDays($daysAgo))->count();
+        })->toArray();
+
         $leadsHoy = Interaction::whereDate('created_at', today())->count();
         $clientesNuevosHoy = Customer::whereDate('created_at', today())->count();
         $leadsHoy = Interaction::whereDate('created_at', today())->count();
@@ -26,6 +30,7 @@ class StatsOverview extends BaseWidget
             Stat::make('Total Leads', Interaction::count())
                 ->description('Histórico acumulado')
                 ->descriptionIcon('heroicon-m-chart-bar')
+                ->chart($trendData) // <-- ¡Datos reales aquí!
                 ->color('success'),
 
             Stat::make('Clientes Únicos', Customer::count())
