@@ -8,6 +8,7 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\SelectColumn; // Por si quieres editar el estado desde la tabla
 use Filament\Tables\Table;
+use Filament\Actions\ViewAction;
 
 class InteractionsTable
 {
@@ -53,6 +54,8 @@ class InteractionsTable
                 // Aquí podrías añadir un filtro por estado más adelante
             ])
             ->actions([
+                ViewAction::make(),
+
                 EditAction::make(),
             ])
             ->bulkActions([

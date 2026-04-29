@@ -81,7 +81,7 @@ Sistema de avisos en tiempo real para la gestión inmediata de leads entrantes.
 - [x] **Alertas de Error:** Implementar avisos específicos para tokens inválidos o fuentes inactivas.
 
 📋 Hoja de Ruta: Funcionalidades Core de Aurora
-- [ ] **1. Vista de Consulta (Infolist)**
+- [x] **1. Vista de Consulta (Infolist)**
 Es: Una pantalla intermedia entre la lista y el formulario de edición.
 
 Funcion: Permite visualizar todos los datos del lead, notas y servicios contratados en un formato de "tarjetas" limpio, evitando modificar datos por error.

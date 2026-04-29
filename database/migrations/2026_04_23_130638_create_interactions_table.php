@@ -17,8 +17,8 @@ return new class extends Migration
             $table->foreignId('customer_id')->constrained()->cascadeOnDelete();
             $table->foreignId('source_id')->constrained()->cascadeOnDelete();
             $table->foreignId('service_id')->nullable()->constrained('services')->nullOnDelete();
-
-            $table->string('status')->default('nuevo'); // nuevo, contactado, vendido, etc.
+            $table->string('status')->default('nuevo');
+            $table->text('message')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
         });

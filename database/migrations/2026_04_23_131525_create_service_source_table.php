@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('service_id')->constrained()->cascadeOnDelete();
             $table->foreignId('source_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
+
+            $table->unique(['service_id', 'source_id']);
         });
     }
 
