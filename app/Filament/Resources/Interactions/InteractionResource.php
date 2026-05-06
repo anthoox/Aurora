@@ -21,7 +21,7 @@ class InteractionResource extends Resource
 {
     protected static ?string $model = Interaction::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedInbox;
 
     public static function form(Schema $schema): Schema
     {
