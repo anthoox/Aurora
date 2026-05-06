@@ -123,7 +123,7 @@ Centralizar toda la información del cliente en una sola vista.
 - [x] Ver servicios solicitados
 - [x] Ver reservas futuras
 - [x] Ver notas internas
-- [ ] Ver historial comercial
+- [x] Ver historial comercial
 - [x] Ver enlace a editar desde la vista de cliente y botón de volver a vista del cliente
 
 

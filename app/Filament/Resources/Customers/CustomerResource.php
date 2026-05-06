@@ -19,6 +19,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use App\Filament\Resources\Customers\RelationManagers\BookingsRelationManager;
+use App\Filament\Resources\Customers\RelationManagers\InteractionsRelationManager;
 class CustomerResource extends Resource
 {
     protected static ?string $model = Customer::class;
@@ -40,7 +41,7 @@ class CustomerResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\InteractionsRelationManager::class,
+            InteractionsRelationManager::class,
             BookingsRelationManager::class,
         ];
     }
