@@ -17,7 +17,7 @@ use Filament\Tables\Table;
 
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
-
+use App\Filament\Resources\Customers\RelationManagers\BookingsRelationManager;
 class CustomerResource extends Resource
 {
     protected static ?string $model = Customer::class;
@@ -40,6 +40,7 @@ class CustomerResource extends Resource
     {
         return [
             RelationManagers\InteractionsRelationManager::class,
+            BookingsRelationManager::class,
         ];
     }
 
@@ -52,6 +53,7 @@ class CustomerResource extends Resource
             'edit' => EditCustomer::route('/{record}/edit'),
         ];
     }
+    
 
     public static function infolist(Schema $schema): Schema
     {
@@ -86,6 +88,8 @@ class CustomerResource extends Resource
                             ->placeholder('Sin datos adicionales')
                             ->columnSpanFull(),
                     ]),
+                    
             ]);
     }
+    
 }
