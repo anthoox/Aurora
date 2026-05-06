@@ -14,7 +14,8 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-
+use Filament\Actions\Action;
+use Filament\Forms\Components\Textarea;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use App\Filament\Resources\Customers\RelationManagers\BookingsRelationManager;
@@ -83,7 +84,31 @@ class CustomerResource extends Resource
                             ->dateTime('d/m/Y H:i'),
                     ])
                     ->columns(2),
-
+                Section::make('Notas internas')
+                    ->headerActions([
+                        Action::make('editNotes')
+                            ->label('Editar notas')
+                            ->icon('heroicon-o-pencil-square')
+                            ->modalHeading('Editar notas internas')
+                            ->form([
+                                Textarea::make('internal_notes')
+                                    ->label('Notas internas')
+                                    ->rows(8)
+                                    ->default(fn($record) => $record->internal_notes)
+                                    ->columnSpanFull(),
+                            ])
+                            ->action(function (array $data, $record): void {
+                                $record->update([
+                                    'internal_notes' => $data['internal_notes'],
+                                ]);
+                            }),
+                    ])
+                    ->schema([
+                        TextEntry::make('internal_notes')
+                            ->label('')
+                            ->placeholder('Sin notas internas')
+                            ->columnSpanFull(),
+                    ]),
                 Section::make('Información adicional')
                     ->schema([
                         TextEntry::make('metadata')
@@ -91,15 +116,9 @@ class CustomerResource extends Resource
                             ->placeholder('Sin datos adicionales')
                             ->columnSpanFull(),
                     ]),
-                Section::make('Notas internas')
-                    ->schema([
-                        TextEntry::make('internal_notes')
-                            ->label('')
-                            ->placeholder('Sin notas internas')
-                            ->columnSpanFull(),
-                    ]),
-                    
+
+
             ]);
     }
-    
+
 }
