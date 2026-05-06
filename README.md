@@ -79,46 +79,344 @@ Sistema de avisos en tiempo real para la gestión inmediata de leads entrantes.
 - [x] **Trigger en LeadController:** Implementar el envío de notificaciones internas al recibir un lead exitoso por la API.
 - [x] **Notificaciones en Panel:** Configurar el componente `DatabaseNotifications` de Filament para mostrar la "campanita" en el Header.
 - [x] **Alertas de Error:** Implementar avisos específicos para tokens inválidos o fuentes inactivas.
+- [x] **1. Vista de Consulta (Infolist)** Es: Una pantalla intermedia entre la lista y el formulario de edición. Funcion: Permite visualizar todos los datos del lead, notas y servicios contratados en un formato de "tarjetas" limpio, evitando modificar datos por error.
 
-📋 Hoja de Ruta: Funcionalidades Core de Aurora
-- [x] **1. Vista de Consulta (Infolist)**
-Es: Una pantalla intermedia entre la lista y el formulario de edición.
 
-Funcion: Permite visualizar todos los datos del lead, notas y servicios contratados en un formato de "tarjetas" limpio, evitando modificar datos por error.
+# 🧩 FASE 1 — Consolidar el CRM Base
 
-Pasos: Usaremos la clase Infolist de Filament para organizar los campos de forma elegante.
+Objetivo:
+Construir un CRM sólido, rápido y cómodo antes de añadir automatizaciones avanzadas.
 
-- [ ] **2. Gestión de Catálogo y Precios**
-Es: Un nuevo módulo de Servicios.
+---
 
-Funcion: Para que cada web (Source) pueda tener sus propios servicios con descripción y precio.
+## 1. Filtros avanzados de leads
 
-Pasos: Crearemos la tabla services vinculada a sources. Esto permitirá que, al entrar un lead de "Web A", solo puedas elegir servicios de esa web.
+### Objetivo
+Facilitar la gestión de grandes cantidades de leads.
 
-- [ ] **3. Módulo de Reservas y Sincronización con Google Calendar**
-Es: El corazón del CRM. Una sección de Bookings (Citas).
+### Funcionalidades
+- [ ] Filtrar por estado
+- [ ] Filtrar por web/source
+- [ ] Filtrar por servicio
+- [ ] Filtrar por fecha
+- [ ] Filtrar leads sin contactar
+- [ ] Filtrar leads vendidos
+- [ ] Filtrar leads descartados
+- [ ] Búsqueda avanzada de clientes
 
-Funcion: Agendar el día y la hora de la prestación del servicio. Al guardar, se crea automáticamente el evento en tu Google Calendar y se le envía la invitación al correo del cliente.
+### Aprendizajes
+- Filtros de Filament
+- Query Builder
+- Optimización de tablas
 
-Pasos: Usaremos la API de Google y un "Observer" en Laravel que detecte cuando se crea una reserva para disparar la sincronización.
+---
 
-- [ ] **4. Acción de "WhatsApp Rápido"**
-Es: Un botón dinámico en la ficha del lead.
+## 2. Vista completa del cliente
 
-Funcion: Iniciar una conversación con un solo clic. Al pulsarlo, abre WhatsApp con el número del cliente y un mensaje como: "Hola [Nombre], te contacto desde [Web] por tu consulta sobre [Servicio]...".
+### Objetivo
+Centralizar toda la información del cliente en una sola vista.
 
-Pasos: Un botón de acción que construye una URL dinámica: https://wa.me/telefono?text=mensaje_codificado.
+### Funcionalidades
+- [ ] Ver datos personales
+- [ ] Ver historial de leads
+- [ ] Ver servicios solicitados
+- [ ] Ver reservas futuras
+- [ ] Ver notas internas
+- [ ] Ver historial comercial
 
-- [ ] **5. Centro de Mensajería y Automatización de Estados**
-Es: Un historial de mensajes enviados desde Aurora.
+### Aprendizajes
+- Relaciones complejas
+- Infolists avanzados
+- Arquitectura CRM
 
-Funcion: Para que todo el equipo sepa qué se le ha dicho al cliente. Además, cuando envíes el primer mensaje, Aurora cambiará el estado a "Contactado" automáticamente. Al crear la reserva, el estado pasará a "Reservado".
+---
 
-Pasos: Una tabla messages y lógica de eventos en Laravel que actualice el campo status de la interacción según la actividad.
+## 3. Sistema de detección de duplicados
 
-- [ ] **6. Sistema de Recordatorios de Seguimiento**
-Es: Alertas basadas en fechas.
+### Objetivo
+Evitar clientes duplicados.
 
-Funcion: Para que no se te "enfríe" ningún lead. Si un lead no ha pasado a reserva en 48h, aparecerá en una sección de "Pendientes de seguimiento".
+### Funcionalidades
+- [ ] Detectar email existente
+- [ ] Detectar teléfono existente
+- [ ] Asociar nuevas interacciones al mismo cliente
+- [ ] Mostrar aviso de cliente recurrente
 
-Pasos: Un filtro en el Dashboard que resalte las interacciones cuya updated_at sea antigua y sigan en estado "Contactado".
+### Aprendizajes
+- Lógica de negocio
+- Validaciones
+- Reutilización de modelos
+
+---
+
+## 4. Historial de interacciones (Timeline)
+
+### Objetivo
+Tener trazabilidad completa de acciones realizadas sobre un lead.
+
+### Funcionalidades
+- [ ] Registrar cambios de estado
+- [ ] Registrar notas internas
+- [ ] Registrar creación de reservas
+- [ ] Mostrar timeline cronológico
+
+### Aprendizajes
+- Eventos y observers
+- Activity logs
+- Diseño de timeline
+
+---
+
+## 5. Acción rápida de WhatsApp
+
+### Objetivo
+Contactar clientes rápidamente desde el CRM.
+
+### Funcionalidades
+- [ ] Botón de WhatsApp en leads
+- [ ] Mensaje automático dinámico
+- [ ] Datos dinámicos:
+  - Nombre
+  - Servicio
+  - Web/source
+
+### Aprendizajes
+- URL dinámicas
+- UX rápida
+- Acciones de Filament
+
+---
+
+# 📅 FASE 2 — Reservas y Operativa
+
+Objetivo:
+Convertir Aurora en una herramienta real de gestión de servicios y citas.
+
+---
+
+## 6. Gestión de catálogo y precios
+
+### Objetivo
+Permitir que cada web tenga servicios personalizados.
+
+### Funcionalidades
+- [ ] Servicios asociados a cada Source
+- [ ] Precios personalizados
+- [ ] Descripciones
+- [ ] Filtrado automático por web
+
+### Aprendizajes
+- Relaciones many-to-many
+- Arquitectura modular
+- Formularios dinámicos
+
+---
+
+## 7. Módulo de reservas (Bookings)
+
+### Objetivo
+Gestionar citas y reservas desde el CRM.
+
+### Funcionalidades
+- [ ] Crear reservas
+- [ ] Fecha y hora
+- [ ] Estado de reserva:
+  - Pendiente
+  - Confirmada
+  - Cancelada
+  - Realizada
+
+### Aprendizajes
+- Diseño de flujos
+- Nuevos recursos Filament
+- Estados comerciales
+
+---
+
+## 8. Integración con Google Calendar
+
+### Objetivo
+Sincronizar automáticamente las reservas.
+
+### Funcionalidades
+- [ ] Crear evento en Google Calendar
+- [ ] Enviar invitación al cliente
+- [ ] Sincronización automática
+- [ ] Actualización de eventos
+
+### Aprendizajes
+- APIs externas
+- OAuth
+- Laravel Services
+- Observers
+
+---
+
+# 🤖 FASE 3 — Automatización Comercial
+
+Objetivo:
+Automatizar tareas repetitivas y mejorar seguimiento comercial.
+
+---
+
+## 9. Automatización de estados
+
+### Objetivo
+Actualizar automáticamente estados del lead.
+
+### Funcionalidades
+- [ ] Primer contacto → Contactado
+- [ ] Reserva creada → Reservado
+- [ ] Reserva finalizada → Convertido
+
+### Aprendizajes
+- Eventos
+- Automatización de negocio
+- Lógica desacoplada
+
+---
+
+## 10. Centro de mensajería
+
+### Objetivo
+Centralizar mensajes enviados al cliente.
+
+### Funcionalidades
+- [ ] Historial de WhatsApps
+- [ ] Historial de emails
+- [ ] Notas internas
+- [ ] Registro de actividad
+
+### Aprendizajes
+- Arquitectura de comunicaciones
+- Historial persistente
+- Timeline avanzado
+
+---
+
+## 11. Sistema de seguimiento automático
+
+### Objetivo
+Evitar perder leads.
+
+### Funcionalidades
+- [ ] Leads pendientes de seguimiento
+- [ ] Leads sin respuesta en X horas
+- [ ] Alertas internas
+- [ ] Dashboard comercial
+
+### Aprendizajes
+- Jobs
+- Scheduler
+- Automatizaciones Laravel
+
+---
+
+# 📊 FASE 4 — Métricas y Negocio
+
+Objetivo:
+Convertir Aurora en una herramienta de análisis comercial.
+
+---
+
+## 12. Dashboard avanzado
+
+### Métricas
+- [ ] Leads mensuales
+- [ ] Conversión por web
+- [ ] Conversión por servicio
+- [ ] Leads vendidos
+- [ ] Leads pendientes
+- [ ] Tiempo medio de contacto
+- [ ] Servicios más vendidos
+- [ ] Webs más rentables
+
+### Aprendizajes
+- Analytics
+- KPIs
+- Consultas complejas
+
+---
+
+## 13. Gestión comercial y ventas
+
+### Objetivo
+Controlar presupuestos y ventas.
+
+### Funcionalidades
+- [ ] Precio estimado
+- [ ] Precio final
+- [ ] Forma de pago
+- [ ] Estado comercial
+- [ ] Observaciones de venta
+
+### Aprendizajes
+- Flujo comercial
+- Estados financieros
+- CRM avanzado
+
+---
+
+# 👥 FASE 5 — Escalado
+
+Objetivo:
+Preparar Aurora para equipos.
+
+---
+
+## 14. Usuarios y roles
+
+### Roles
+- [ ] Administrador
+- [ ] Comercial/Gestor
+- [ ] Solo lectura
+
+### Funcionalidades
+- [ ] Restricción de permisos
+- [ ] Acceso por módulos
+- [ ] Gestión de usuarios
+
+### Aprendizajes
+- Policies
+- Permissions
+- Multiusuario
+
+---
+
+# 🔮 Ideas futuras
+
+- [ ] Emails automáticos
+- [ ] Pipeline comercial tipo Kanban
+- [ ] Integración con Telegram
+- [ ] Integración con Stripe
+- [ ] Exportación PDF/Excel
+- [ ] Facturación
+- [ ] Webhooks externos
+- [ ] API pública
+- [ ] Sistema multiempresa
+- [ ] Aplicación móvil
+
+---
+
+# 🛠 Stack tecnológico
+
+- Laravel 12
+- PHP 8.3
+- Filament PHP v4
+- MySQL
+- TailwindCSS
+- Livewire
+- Alpine.js
+
+---
+
+# 🧠 Filosofía del proyecto
+
+Aurora busca ser:
+
+- Simple de usar
+- Rápido para el negocio
+- Escalable
+- Automatizable
+- Modular
+- Profesional
