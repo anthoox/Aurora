@@ -55,7 +55,6 @@ class InteractionsTable
             ])
             ->actions([
                 ViewAction::make(),
-
                 EditAction::make(),
             ])
             ->bulkActions([

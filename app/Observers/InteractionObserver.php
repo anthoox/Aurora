@@ -8,6 +8,7 @@ use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Log; // Para que Log:: funcionen
 use Illuminate\Support\Str; 
 use Filament\Actions\Action;
+use App\Filament\Resources\Interactions\InteractionResource;
 class InteractionObserver
 {
     /**
@@ -29,7 +30,7 @@ class InteractionObserver
                     ->actions([
                         Action::make('view')
                             ->label('Ver Lead')
-                            ->url(fn() => "/admin/interactions/{$interaction->id}/edit")
+                            ->url(fn() => InteractionResource::getUrl('view', ['record' => $interaction]))
                             ->markAsRead(), // Opcional: marca como leída al clicar
                     ]);
 

@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Interactions;
 use App\Filament\Resources\Interactions\Pages\CreateInteraction;
 use App\Filament\Resources\Interactions\Pages\EditInteraction;
 use App\Filament\Resources\Interactions\Pages\ListInteractions;
+use App\Filament\Resources\Interactions\Pages\ViewInteraction;
 use App\Filament\Resources\Interactions\Schemas\InteractionForm;
 use App\Filament\Resources\Interactions\Tables\InteractionsTable;
 use App\Models\Interaction;
@@ -44,6 +45,7 @@ class InteractionResource extends Resource
         return [
             'index' => ListInteractions::route('/'),
             'create' => CreateInteraction::route('/create'),
+            'view' => ViewInteraction::route('/{record}'),
             'edit' => EditInteraction::route('/{record}/edit'),
         ];
     }
@@ -56,7 +58,14 @@ class InteractionResource extends Resource
                     ->schema([
                         TextEntry::make('status')
                             ->label('Estado')
-                            ->badge(),
+                            ->badge()
+                            ->color(fn(string $state): string => match ($state) {
+                                'nuevo' => 'gray',
+                                'contactado' => 'info',
+                                'vendido' => 'success',
+                                'descartado' => 'danger',
+                                default => 'gray',
+                            }),
 
                         TextEntry::make('service.name')
                             ->label('Servicio'),
