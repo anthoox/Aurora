@@ -26,7 +26,10 @@ class ServiceResource extends Resource
     {
         return ServiceForm::configure($schema);
     }
+    
+    protected static ?string $navigationLabel = 'Servicios';
 
+    protected static string|\UnitEnum|null $navigationGroup = 'CRM';
     public static function table(Table $table): Table
     {
         return ServicesTable::configure($table);

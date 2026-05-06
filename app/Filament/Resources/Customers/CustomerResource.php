@@ -53,7 +53,10 @@ class CustomerResource extends Resource
             'edit' => EditCustomer::route('/{record}/edit'),
         ];
     }
-    
+
+    protected static ?string $navigationLabel = 'Clientes';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'CRM';
 
     public static function infolist(Schema $schema): Schema
     {

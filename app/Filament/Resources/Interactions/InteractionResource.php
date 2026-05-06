@@ -27,6 +27,9 @@ class InteractionResource extends Resource
     {
         return InteractionForm::configure($schema);
     }
+    protected static ?string $navigationLabel = 'Interacciones';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'CRM';
 
     public static function table(Table $table): Table
     {

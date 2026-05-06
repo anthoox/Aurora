@@ -26,7 +26,9 @@ class SourceResource extends Resource
     {
         return SourceForm::configure($schema);
     }
+    protected static ?string $navigationLabel = 'Fuentes';
 
+    protected static string|\UnitEnum|null $navigationGroup = 'CRM';
     public static function table(Table $table): Table
     {
         return SourcesTable::configure($table);
