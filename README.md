@@ -118,7 +118,7 @@ Facilitar la gestión de grandes cantidades de leads.
 Centralizar toda la información del cliente en una sola vista.
 
 ### Funcionalidades
-- [ ] Ver datos personales
+- [x] Ver datos personales
 - [ ] Ver historial de leads
 - [ ] Ver servicios solicitados
 - [ ] Ver reservas futuras
