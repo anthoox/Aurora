@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Customers;
 use App\Filament\Resources\Customers\Pages\CreateCustomer;
 use App\Filament\Resources\Customers\Pages\EditCustomer;
 use App\Filament\Resources\Customers\Pages\ListCustomers;
+use App\Filament\Resources\Customers\Pages\ViewCustomer;
 use App\Filament\Resources\Customers\Schemas\CustomerForm;
 use App\Filament\Resources\Customers\Tables\CustomersTable;
 use App\Models\Customer;
@@ -13,6 +14,9 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+
+use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Section;
 
 class CustomerResource extends Resource
 {
@@ -44,7 +48,44 @@ class CustomerResource extends Resource
         return [
             'index' => ListCustomers::route('/'),
             'create' => CreateCustomer::route('/create'),
+            'view' => ViewCustomer::route('/{record}'),
             'edit' => EditCustomer::route('/{record}/edit'),
         ];
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                Section::make('Datos personales')
+                    ->schema([
+                        TextEntry::make('first_name')
+                            ->label('Nombre'),
+
+                        TextEntry::make('last_name')
+                            ->label('Apellidos')
+                            ->placeholder('Sin apellidos'),
+
+                        TextEntry::make('email')
+                            ->label('Email'),
+
+                        TextEntry::make('phone')
+                            ->label('Teléfono')
+                            ->placeholder('Sin teléfono'),
+
+                        TextEntry::make('created_at')
+                            ->label('Cliente desde')
+                            ->dateTime('d/m/Y H:i'),
+                    ])
+                    ->columns(2),
+
+                Section::make('Información adicional')
+                    ->schema([
+                        TextEntry::make('metadata')
+                            ->label('Datos extra')
+                            ->placeholder('Sin datos adicionales')
+                            ->columnSpanFull(),
+                    ]),
+            ]);
     }
 }
