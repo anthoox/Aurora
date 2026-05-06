@@ -6,9 +6,10 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\SelectColumn; // Por si quieres editar el estado desde la tabla
 use Filament\Tables\Table;
 use Filament\Actions\ViewAction;
+use Filament\Tables\Filters\SelectFilter;
+
 
 class InteractionsTable
 {
@@ -51,7 +52,20 @@ class InteractionsTable
                     ->sortable(),
             ])
             ->filters([
-                // Aquí podrías añadir un filtro por estado más adelante
+                SelectFilter::make('status')
+                    ->label('Estado')
+                    ->options([
+                        'nuevo' => 'Nuevo',
+                        'contactado' => 'Contactado',
+                        'vendido' => 'Vendido',
+                        'descartado' => 'Descartado',
+                    ]),
+                SelectFilter::make('source_id')
+                    ->label('Origen')
+                    ->relationship('source', 'name'),
+                SelectFilter::make('service_id')
+                    ->label('Servicio')
+                    ->relationship('service', 'name'),
             ])
             ->actions([
                 ViewAction::make(),

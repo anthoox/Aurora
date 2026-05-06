@@ -123,6 +123,8 @@ Centralizar toda la información del cliente en una sola vista.
 - [ ] Ver reservas futuras
 - [ ] Ver notas internas
 - [ ] Ver historial comercial
+- [ ] Ver enlace a editar desde la vista de cliente y botón de volver a vista del cliente
+
 
 ### Aprendizajes
 - Relaciones complejas
