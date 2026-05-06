@@ -91,6 +91,20 @@ class InteractionsTable
                                 $query->whereDate('created_at', '<=', $date),
                             );
                     }),
+                Filter::make('sin_contactar')
+                    ->label('Sin contactar')
+                    ->query(fn(Builder $query): Builder => $query->where('status', 'nuevo')),
+                Filter::make('contactados')
+                    ->label('Contactados')
+                    ->query(fn(Builder $query): Builder => $query->where('status', 'contactado')),
+
+                Filter::make('vendidos')
+                    ->label('Vendidos')
+                    ->query(fn(Builder $query): Builder => $query->where('status', 'vendido')),
+
+                Filter::make('descartados')
+                    ->label('Descartados')
+                    ->query(fn(Builder $query): Builder => $query->where('status', 'descartado')),
             ])
             ->actions([
                 ViewAction::make(),
