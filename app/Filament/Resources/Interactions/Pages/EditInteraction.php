@@ -5,6 +5,8 @@ namespace App\Filament\Resources\Interactions\Pages;
 use App\Filament\Resources\Interactions\InteractionResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Actions\ViewAction;
+
 
 class EditInteraction extends EditRecord
 {
@@ -14,6 +16,8 @@ class EditInteraction extends EditRecord
     {
         return [
             DeleteAction::make(),
+            ViewAction::make(),
+
         ];
     }
 }

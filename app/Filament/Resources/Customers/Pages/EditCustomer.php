@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Customers\Pages;
 use App\Filament\Resources\Customers\CustomerResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Actions\ViewAction;
 
 class EditCustomer extends EditRecord
 {
@@ -14,6 +15,9 @@ class EditCustomer extends EditRecord
     {
         return [
             DeleteAction::make(),
+            ViewAction::make(),
+
         ];
     }
+
 }

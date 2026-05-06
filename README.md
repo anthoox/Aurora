@@ -119,8 +119,8 @@ Centralizar toda la información del cliente en una sola vista.
 
 ### Funcionalidades
 - [x] Ver datos personales
-- [ ] Ver historial de leads
-- [ ] Ver servicios solicitados
+- [x] Ver historial de leads
+- [x] Ver servicios solicitados
 - [ ] Ver reservas futuras
 - [ ] Ver notas internas
 - [ ] Ver historial comercial
@@ -398,7 +398,7 @@ Preparar Aurora para equipos.
 - [ ] API pública
 - [ ] Sistema multiempresa
 - [ ] Aplicación móvil
-
+- [ ] Que adminitrador total añada campos nuevos en cada recurso
 ---
 
 # 🛠 Stack tecnológico
