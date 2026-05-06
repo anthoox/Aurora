@@ -23,9 +23,19 @@ class InteractionsTable
                 // Mostramos el email del cliente a través de la relación 'customer'
                 TextColumn::make('customer.email')
                     ->label('Cliente')
-                    ->searchable()
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->whereHas('customer', function (Builder $query) use ($search) {
+                            $query
+                                ->where('first_name', 'like', "%{$search}%")
+                                ->orWhere('last_name', 'like', "%{$search}%")
+                                ->orWhere('email', 'like', "%{$search}%")
+                                ->orWhere('phone', 'like', "%{$search}%");
+                        });
+                    })
                     ->sortable(),
-
+                TextColumn::make('customer.first_name')
+                    ->label('Nombre')
+                    ->sortable(),
                 // Mostramos el nombre de la web de origen
                 TextColumn::make('source.name')
                     ->label('Origen')

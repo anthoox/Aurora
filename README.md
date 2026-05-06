@@ -98,11 +98,12 @@ Facilitar la gestión de grandes cantidades de leads.
 - [x] Filtrar por estado
 - [x] Filtrar por web/source
 - [x] Filtrar por servicio
-- [ ] Filtrar por fecha
-- [ ] Filtrar leads sin contactar
-- [ ] Filtrar leads vendidos
-- [ ] Filtrar leads descartados
-- [ ] Búsqueda avanzada de clientes
+- [x] Filtrar por fecha
+- [x] Filtrar leads sin contactar
+- [x] Filtrar leads contactado
+- [x] Filtrar leads vendidos
+- [x] Filtrar leads descartados
+- [x] Búsqueda avanzada de clientes
 
 ### Aprendizajes
 - Filtros de Filament
