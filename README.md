@@ -121,7 +121,7 @@ Centralizar toda la información del cliente en una sola vista.
 - [x] Ver datos personales
 - [x] Ver historial de leads
 - [x] Ver servicios solicitados
-- [ ] Ver reservas futuras
+- [x] Ver reservas futuras
 - [ ] Ver notas internas
 - [ ] Ver historial comercial
 - [ ] Ver enlace a editar desde la vista de cliente y botón de volver a vista del cliente

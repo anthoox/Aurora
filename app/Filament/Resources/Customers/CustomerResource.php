@@ -91,6 +91,13 @@ class CustomerResource extends Resource
                             ->placeholder('Sin datos adicionales')
                             ->columnSpanFull(),
                     ]),
+                Section::make('Notas internas')
+                    ->schema([
+                        TextEntry::make('internal_notes')
+                            ->label('')
+                            ->placeholder('Sin notas internas')
+                            ->columnSpanFull(),
+                    ]),
                     
             ]);
     }

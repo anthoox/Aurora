@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Customers\Schemas;
 
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea; 
 use Filament\Schemas\Schema;
 
 class CustomerForm
@@ -26,6 +27,11 @@ class CustomerForm
                 TextInput::make('phone')
                     ->label('Teléfono')
                     ->tel(),
+                Textarea::make('internal_notes')
+                    ->label('Notas internas')
+                    ->rows(5)
+                    ->columnSpanFull()
+                    ->placeholder('Añade observaciones internas del cliente'),
             ]);
     }
 }
