@@ -95,9 +95,9 @@ Construir un CRM sólido, rápido y cómodo antes de añadir automatizaciones av
 Facilitar la gestión de grandes cantidades de leads.
 
 ### Funcionalidades
-- [ ] Filtrar por estado
-- [ ] Filtrar por web/source
-- [ ] Filtrar por servicio
+- [x] Filtrar por estado
+- [x] Filtrar por web/source
+- [x] Filtrar por servicio
 - [ ] Filtrar por fecha
 - [ ] Filtrar leads sin contactar
 - [ ] Filtrar leads vendidos

@@ -10,6 +10,9 @@ use Filament\Tables\Table;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Filters\SelectFilter;
 
+use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Filters\Filter;
+use Illuminate\Database\Eloquent\Builder;
 
 class InteractionsTable
 {
@@ -66,6 +69,28 @@ class InteractionsTable
                 SelectFilter::make('service_id')
                     ->label('Servicio')
                     ->relationship('service', 'name'),
+                Filter::make('created_at')
+                    ->label('Fecha')
+                    ->form([
+                        DatePicker::make('created_from')
+                            ->label('Desde'),
+
+                        DatePicker::make('created_until')
+                            ->label('Hasta'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['created_from'],
+                                fn(Builder $query, $date): Builder =>
+                                $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['created_until'],
+                                fn(Builder $query, $date): Builder =>
+                                $query->whereDate('created_at', '<=', $date),
+                            );
+                    }),
             ])
             ->actions([
                 ViewAction::make(),
