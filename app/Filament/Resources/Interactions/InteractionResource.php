@@ -80,7 +80,7 @@ class InteractionResource extends Resource
                             ->label('Fecha de entrada')
                             ->dateTime('d/m/Y H:i'),
                     ])
-                    ->columns(4),
+                    ->columns(2),
 
                 Section::make('Cliente')
                     ->schema([
@@ -105,7 +105,8 @@ class InteractionResource extends Resource
                             ->label('Mensaje del cliente')
                             ->placeholder('Sin mensaje')
                             ->columnSpanFull(),
-                    ]),
+                    ])                    ->columns(2),
+
 
                 Section::make('Gestión interna')
                     ->schema([
@@ -117,7 +118,29 @@ class InteractionResource extends Resource
                         TextEntry::make('updated_at')
                             ->label('Última actualización')
                             ->dateTime('d/m/Y H:i'),
-                    ]),
+                    ])->columns(2),
+
+                Section::make('Cliente recurrente')
+                    ->visible(
+                        fn($record) =>
+                        $record->customer
+                            ->interactions()
+                            ->where('id', '!=', $record->id)
+                            ->count() > 0
+                    )
+                    ->schema([
+                        TextEntry::make('customer.id')
+                            ->label('')
+                            ->formatStateUsing(function ($record) {
+                                $count = $record->customer
+                                    ->interactions()
+                                    ->where('id', '!=', $record->id)
+                                    ->count();
+
+                                return "⚠ Este cliente tiene {$count} solicitudes previas.";
+                            }),
+                    ])
+                    ->compact(),     
             ]);
     }
 }

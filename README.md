@@ -140,10 +140,10 @@ Centralizar toda la información del cliente en una sola vista.
 Evitar clientes duplicados.
 
 ### Funcionalidades
-- [ ] Detectar email existente
-- [ ] Detectar teléfono existente
-- [ ] Asociar nuevas interacciones al mismo cliente
-- [ ] Mostrar aviso de cliente recurrente
+- [x] Detectar email existente
+- [x] Detectar teléfono existente
+- [x] Asociar nuevas interacciones al mismo cliente
+- [x] Mostrar aviso de cliente recurrente
 
 ### Aprendizajes
 - Lógica de negocio

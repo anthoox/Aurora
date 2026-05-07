@@ -52,7 +52,11 @@ class LeadController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'first_name' => 'required|string',
-            'service_id' => 'exists:services,id' // Opcional pero recomendado
+            'service_id' => 'nullable|exists:services,id',
+            'message' => 'nullable|string',
+            'phone' => 'nullable|string',
+            'last_name' => 'nullable|string',
+            'metadata' => 'nullable|array',
         ]);
 
         if ($validator->fails()) {
@@ -85,15 +89,31 @@ class LeadController extends Controller
 
         // 3. LÓGICA DE NO DUPLICIDAD (updateOrCreate)
         // Si el email existe, actualiza nombre y teléfono. Si no, lo crea.
-        $customer = Customer::updateOrCreate(
-            ['email' => $request->email], // Criterio de búsqueda
-            [
+        $customer = Customer::query()
+            ->where('email', $request->email)
+            ->when($request->filled('phone'), function ($query) use ($request) {
+                $query->orWhere('phone', $request->phone);
+            })
+            ->first();
+
+        $isRecurrentCustomer = (bool) $customer;
+
+        if ($customer) {
+            $customer->update([
                 'first_name' => $request->first_name,
                 'last_name' => $request->last_name,
                 'phone' => $request->phone,
-                'metadata' => $request->metadata, // Guardamos datos extra como JSON
-            ]
-        );
+                'metadata' => $request->metadata,
+            ]);
+        } else {
+            $customer = Customer::create([
+                'email' => $request->email,
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'phone' => $request->phone,
+                'metadata' => $request->metadata,
+            ]);
+        }
 
         // 4. REGISTRAR LA INTERACCIÓN
         $interaction = Interaction::create([
@@ -101,12 +121,17 @@ class LeadController extends Controller
             'source_id' => $source->id,
             'service_id' => $request->service_id,
             'status' => 'nuevo',
+            'message' => $request->message,
             'notes' => 'Lead recibido vía API desde ' . $source->name,
         ]);
 
         return response()->json([
             'message' => 'Lead procesado correctamente',
-            'interaction_id' => $interaction->id
+            'interaction_id' => $interaction->id,
+            'is_recurrent_customer' => $isRecurrentCustomer,
+            'previous_interactions_count' => $customer->interactions()
+                ->where('id', '!=', $interaction->id)
+                ->count(),
         ], 201);
     }
 }
