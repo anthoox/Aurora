@@ -388,6 +388,8 @@ Preparar Aurora para equipos.
 
 # 🔮 Ideas futuras
 
+- [ ] Que adminitrador total añada campos nuevos en cada recurso
+- [ ] Reserva desde la interacción
 - [ ] Emails automáticos
 - [ ] Pipeline comercial tipo Kanban
 - [ ] Integración con Telegram
@@ -398,7 +400,7 @@ Preparar Aurora para equipos.
 - [ ] API pública
 - [ ] Sistema multiempresa
 - [ ] Aplicación móvil
-- [ ] Que adminitrador total añada campos nuevos en cada recurso
+
 ---
 
 # 🛠 Stack tecnológico

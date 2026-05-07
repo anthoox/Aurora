@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Observers\InteractionObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[ObservedBy(InteractionObserver::class)]
 class Interaction extends Model
@@ -27,5 +28,10 @@ class Interaction extends Model
     public function bookings()
     {
         return $this->hasMany(Booking::class);
+    }
+
+    public function events(): HasMany
+    {
+        return $this->hasMany(InteractionEvent::class);
     }
 }

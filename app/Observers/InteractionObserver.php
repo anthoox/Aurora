@@ -57,7 +57,15 @@ class InteractionObserver
      */
     public function updated(Interaction $interaction): void
     {
-        //
+        if ($interaction->wasChanged('status')) {
+            $interaction->events()->create([
+                'user_id' => auth()->id(),
+                'type' => 'status_changed',
+                'description' => "Estado cambiado de {$interaction->getOriginal('status')} a {$interaction->status}",
+                'old_value' => $interaction->getOriginal('status'),
+                'new_value' => $interaction->status,
+            ]);
+        }
     }
 
     /**
