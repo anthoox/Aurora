@@ -16,7 +16,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-
+use App\Filament\Resources\Interactions\RelationManagers\EventsRelationManager;
 class InteractionResource extends Resource
 {
     protected static ?string $model = Interaction::class;
@@ -39,7 +39,7 @@ class InteractionResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            EventsRelationManager::class,
         ];
     }
 

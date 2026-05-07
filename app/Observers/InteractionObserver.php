@@ -57,22 +57,40 @@ class InteractionObserver
      */
     public function updated(Interaction $interaction): void
     {
-        if ($interaction->wasChanged('notes')) {
+        if ($interaction->wasChanged('status')) {
+            $interaction->events()->create([
+                'user_id' => auth()->id(),
+                'type' => 'status_changed',
+                'description' => "Estado cambiado de {$interaction->getOriginal('status')} a {$interaction->status}",
+                'old_value' => $interaction->getOriginal('status'),
+                'new_value' => $interaction->status,
+            ]);
+        }
 
+        if ($interaction->wasChanged('notes')) {
             $oldNotes = $interaction->getOriginal('notes');
             $newNotes = $interaction->notes;
 
-            $interaction->events()->create([
-                'user_id' => auth()->id(),
-                'type' => 'note_updated',
-                'description' => 'Notas internas actualizadas',
-                'old_value' => $oldNotes
-                    ? Str::limit($oldNotes, 100)
-                    : null,
-                'new_value' => $newNotes
-                    ? Str::limit($newNotes, 100)
-                    : null,
-            ]);
+            $recentDuplicate = $interaction->events()
+                ->where('type', 'note_updated')
+                ->where('old_value', $oldNotes ? Str::limit($oldNotes, 100) : null)
+                ->where('new_value', $newNotes ? Str::limit($newNotes, 100) : null)
+                ->where('created_at', '>=', now()->subSeconds(5))
+                ->exists();
+
+            if (!$recentDuplicate) {
+                $interaction->events()->create([
+                    'user_id' => auth()->id(),
+                    'type' => 'note_updated',
+                    'description' => 'Notas internas actualizadas',
+                    'old_value' => $oldNotes
+                        ? Str::limit($oldNotes, 100)
+                        : null,
+                    'new_value' => $newNotes
+                        ? Str::limit($newNotes, 100)
+                        : null,
+                ]);
+            }
         }
     }
 
