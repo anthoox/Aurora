@@ -159,7 +159,7 @@ Tener trazabilidad completa de acciones realizadas sobre un lead.
 
 ### Funcionalidades
 - [x] Registrar cambios de estado
-- [ ] Registrar notas internas
+- [x] Registrar notas internas
 - [ ] Registrar creación de reservas
 - [ ] Mostrar timeline cronológico
 

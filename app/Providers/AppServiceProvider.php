@@ -3,7 +3,10 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-
+use App\Models\Booking;
+use App\Observers\BookingObserver;
+use App\Models\Interaction;
+use App\Observers\InteractionObserver;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -19,6 +22,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Interaction::observe(InteractionObserver::class);
+        Booking::observe(BookingObserver::class);
     }
 }

@@ -18,6 +18,10 @@ class Booking extends Model
         'status',
         'notes',
     ];
+    protected $casts = [
+        'starts_at' => 'datetime',
+        'ends_at' => 'datetime',
+    ];
     public function customer()
     {
         return $this->belongsTo(Customer::class);
