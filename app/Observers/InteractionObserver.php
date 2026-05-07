@@ -57,13 +57,21 @@ class InteractionObserver
      */
     public function updated(Interaction $interaction): void
     {
-        if ($interaction->wasChanged('status')) {
+        if ($interaction->wasChanged('notes')) {
+
+            $oldNotes = $interaction->getOriginal('notes');
+            $newNotes = $interaction->notes;
+
             $interaction->events()->create([
                 'user_id' => auth()->id(),
-                'type' => 'status_changed',
-                'description' => "Estado cambiado de {$interaction->getOriginal('status')} a {$interaction->status}",
-                'old_value' => $interaction->getOriginal('status'),
-                'new_value' => $interaction->status,
+                'type' => 'note_updated',
+                'description' => 'Notas internas actualizadas',
+                'old_value' => $oldNotes
+                    ? Str::limit($oldNotes, 100)
+                    : null,
+                'new_value' => $newNotes
+                    ? Str::limit($newNotes, 100)
+                    : null,
             ]);
         }
     }

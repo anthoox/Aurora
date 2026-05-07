@@ -158,10 +158,11 @@ Evitar clientes duplicados.
 Tener trazabilidad completa de acciones realizadas sobre un lead.
 
 ### Funcionalidades
-- [ ] Registrar cambios de estado
+- [x] Registrar cambios de estado
 - [ ] Registrar notas internas
 - [ ] Registrar creación de reservas
 - [ ] Mostrar timeline cronológico
+
 
 ### Aprendizajes
 - Eventos y observers

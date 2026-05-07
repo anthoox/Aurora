@@ -20,6 +20,9 @@ class InteractionsTable
     {
         return $table
             ->columns([
+                TextColumn::make('id')
+                    ->label('Id')
+                    ->sortable(),
                 // Mostramos el email del cliente a través de la relación 'customer'
                 TextColumn::make('customer.email')
                     ->label('Cliente')
