@@ -177,12 +177,13 @@ Tener trazabilidad completa de acciones realizadas sobre un lead.
 Contactar clientes rápidamente desde el CRM.
 
 ### Funcionalidades
-- [ ] Botón de WhatsApp en leads
-- [ ] Mensaje automático dinámico
-- [ ] Datos dinámicos:
+- [x] Botón de WhatsApp en leads
+- [x] Mensaje automático dinámico
+- [x] Datos dinámicos:
   - Nombre
   - Servicio
   - Web/source
+- [x] Regsitrar en timeline:
 
 ### Aprendizajes
 - URL dinámicas
