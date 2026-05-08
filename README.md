@@ -391,6 +391,7 @@ Preparar Aurora para equipos.
 
 - [ ] Que adminitrador total añada campos nuevos en cada recurso
 - [ ] Reserva desde la interacción
+- [ ] Timeline para todos
 - [ ] Emails automáticos
 - [ ] Pipeline comercial tipo Kanban
 - [ ] Integración con Telegram
