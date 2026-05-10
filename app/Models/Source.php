@@ -11,7 +11,13 @@ class Source extends Model
     protected $fillable = ['name', 'slug', 'api_token', 'is_active'];
     public function services(): BelongsToMany
     {
-        return $this->belongsToMany(Service::class);
+        return $this->belongsToMany(Service::class)
+            ->withPivot([
+                'description',
+                'price',
+                'is_active',
+            ])
+            ->withTimestamps();
     }
 
 

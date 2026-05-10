@@ -205,9 +205,9 @@ Convertir Aurora en una herramienta real de gestión de servicios y citas.
 Permitir que cada web tenga servicios personalizados.
 
 ### Funcionalidades
-- [ ] Servicios asociados a cada Source
-- [ ] Precios personalizados
-- [ ] Descripciones
+- [x] Servicios asociados a cada Source
+- [x] Precios personalizados
+- [x] Descripciones
 - [ ] Filtrado automático por web
 
 ### Aprendizajes
