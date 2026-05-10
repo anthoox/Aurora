@@ -4,7 +4,7 @@ namespace App\Filament\Resources\Interactions\Schemas;
 
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
-
+use App\Models\Service;
 use Filament\Forms\Components\Textarea;
 
 class InteractionForm
@@ -21,12 +21,31 @@ class InteractionForm
                     ->searchable()
                     ->required(),
                 Select::make('source_id')
-                    ->label('Origen (Web)')
+                    ->label('Origen')
                     ->relationship('source', 'name')
-                    ->required(),
+                    ->required()
+                    ->live()
+                    ->afterStateUpdated(fn($set) => $set('service_id', null)),
                 Select::make('service_id')
-                    ->label('Servicio Solicitado')
-                    ->relationship('service', 'name'),
+                    ->label('Servicio')
+                    ->options(function ($get) {
+                        $sourceId = $get('source_id');
+
+                        if (!$sourceId) {
+                            return [];
+                        }
+
+                        return Service::query()
+                            ->whereHas('sources', function ($query) use ($sourceId) {
+                                $query
+                                    ->where('sources.id', $sourceId)
+                                    ->where('service_source.is_active', true);
+                            })
+                            ->pluck('name', 'id');
+                    })
+                    ->searchable()
+                    ->preload()
+                    ->placeholder('Selecciona primero un origen'),
                 Select::make('status')
                     ->label('Estado')
                     ->options([

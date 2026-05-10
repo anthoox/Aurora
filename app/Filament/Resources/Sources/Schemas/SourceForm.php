@@ -6,6 +6,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\CheckboxList;
 use Illuminate\Support\Str;
 class SourceForm
 {
@@ -29,6 +30,10 @@ class SourceForm
                     ->default(fn() => Str::random(32)) // Genera uno al azar al crear
                     ->readonly() // Evita que se cambie por error
                     ->required(),
+                CheckboxList::make('services')
+                    ->label('Servicios disponibles')
+                    ->relationship('services', 'name')
+                    ->columns(2)
             ]);
     }
 }
