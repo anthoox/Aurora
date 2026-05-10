@@ -93,7 +93,10 @@ class ServicesRelationManager extends RelationManager
                 'price' => $data['price'],
                 'is_active' => $data['is_active'],
               ]);
+      $this->dispatch('$refresh');
+
           }),
+          
       ]);
   }
   public static function getRelations(): array
