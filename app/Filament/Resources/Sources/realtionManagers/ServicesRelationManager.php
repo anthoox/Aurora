@@ -12,7 +12,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-
+use Filament\Actions\Action;
 class ServicesRelationManager extends RelationManager
 {
   protected static string $relationship = 'services';
@@ -64,24 +64,44 @@ class ServicesRelationManager extends RelationManager
           ]),
       ])
       ->actions([
-        EditAction::make()
+        Action::make('editCatalog')
           ->label('Editar catálogo')
+          ->icon('heroicon-o-pencil-square')
           ->form([
-            Textarea::make('pivot.description')
+            Textarea::make('description')
               ->label('Descripción personalizada')
               ->rows(3),
 
-            TextInput::make('pivot.price')
+            TextInput::make('price')
               ->label('Precio')
               ->numeric()
               ->prefix('€'),
 
-            Toggle::make('pivot.is_active')
+            Toggle::make('is_active')
               ->label('Activo'),
-          ]),
-
-        DetachAction::make()
-          ->label('Quitar'),
+          ])
+          ->fillForm(fn($record): array => [
+            'description' => $record->pivot->description,
+            'price' => $record->pivot->price,
+            'is_active' => $record->pivot->is_active,
+          ])
+          ->action(function ($record, array $data): void {
+            $this->getOwnerRecord()
+              ->services()
+              ->updateExistingPivot($record->id, [
+                'description' => $data['description'],
+                'price' => $data['price'],
+                'is_active' => $data['is_active'],
+              ]);
+          }),
       ]);
   }
+  public static function getRelations(): array
+  {
+    return [
+      ServicesRelationManager::class,
+    ];
+  }
+
+  
 }

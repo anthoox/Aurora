@@ -21,11 +21,11 @@ class ServicesTable
                     ->searchable()
                     ->sortable(),
 
-                // Añadimos el precio
-                TextColumn::make('price')
-                    ->label('Precio')
-                    ->money('eur') // Lo formatea como moneda automáticamente
-                    ->sortable(),
+                // // Añadimos el precio
+                // TextColumn::make('price')
+                //     ->label('Precio')
+                //     ->money('eur') // Lo formatea como moneda automáticamente
+                //     ->sortable(),
 
                 TextColumn::make('created_at')
                     ->label('Creado el')

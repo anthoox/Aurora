@@ -140,7 +140,15 @@ class InteractionResource extends Resource
                                 return "⚠ Este cliente tiene {$count} solicitudes previas.";
                             }),
                     ])
-                    ->compact(),     
+                    ->compact(),
+                TextEntry::make('catalog_price')
+                    ->label('Precio')
+                    ->money('EUR')
+                    ->placeholder('Sin precio configurado'),
+                TextEntry::make('catalog_description')
+                    ->label('Descripción del servicio')
+                    ->placeholder('Sin descripción personalizada')
+                    ->columnSpanFull(),
             ]);
     }
 }

@@ -21,10 +21,10 @@ class ServiceForm
                     ->label('Descripción')
                     ->rows(3),
 
-                TextInput::make('price')
-                    ->label('Precio')
-                    ->numeric()
-                    ->prefix('€'), // O el símbolo de tu moneda
+                // TextInput::make('price')
+                //     ->label('Precio')
+                //     ->numeric()
+                //     ->prefix('€'), // O el símbolo de tu moneda
             ]);
     }
 }

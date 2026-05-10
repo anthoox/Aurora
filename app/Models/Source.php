@@ -29,4 +29,5 @@ class Source extends Model
     {
         return $this->hasMany(Interaction::class);
     }
+    
 }

@@ -10,7 +10,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[ObservedBy(InteractionObserver::class)]
 class Interaction extends Model
 {
-    protected $fillable = ['customer_id', 'source_id', 'service_id', 'status', 'notes'];
+    protected $fillable = [
+        'customer_id',
+        'source_id',
+        'service_id',
+        'status',
+        'message',
+        'notes',
+    ];
 
     public function customer()
     {
@@ -34,4 +41,34 @@ class Interaction extends Model
     {
         return $this->hasMany(InteractionEvent::class);
     }
+    public function getCatalogPriceAttribute(): ?float
+    {
+        if (!$this->source_id || !$this->service_id) {
+            return null;
+        }
+
+        $service = $this->source
+                ?->services()
+            ->where('services.id', $this->service_id)
+            ->first();
+
+        return $service?->pivot?->price !== null
+            ? (float) $service->pivot->price
+            : null;
+    }
+
+    public function getCatalogDescriptionAttribute(): ?string
+    {
+        if (!$this->source_id || !$this->service_id) {
+            return null;
+        }
+
+        $service = $this->source
+                ?->services()
+            ->where('services.id', $this->service_id)
+            ->first();
+
+        return $service?->pivot?->description;
+    }
+    
 }

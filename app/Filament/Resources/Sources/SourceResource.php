@@ -15,6 +15,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use App\Filament\Resources\Sources\RelationManagers\ServicesRelationManager;
 
+
 class SourceResource extends Resource
 {
     protected static ?string $model = Source::class;
@@ -38,7 +39,7 @@ class SourceResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            ServicesRelationManager::class,
         ];
     }
 
