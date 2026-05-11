@@ -8,6 +8,10 @@ use Filament\Resources\Pages\ViewRecord;
 use Filament\Actions\EditAction;
 use Filament\Actions\Action;
 use Illuminate\Support\Str;
+use App\Models\Booking;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 
 class ViewInteraction extends ViewRecord
 {
@@ -23,8 +27,8 @@ class ViewInteraction extends ViewRecord
         ->disabled(fn() => blank($this->record->customer->phone))
         ->tooltip(
           fn() => blank($this->record->customer->phone)
-            ? 'Este cliente no tiene teléfono registrado'
-            : 'Contactar por WhatsApp'
+          ? 'Este cliente no tiene teléfono registrado'
+          : 'Contactar por WhatsApp'
         )
         ->action(function () {
           $phone = preg_replace('/\D+/', '', $this->record->customer->phone);
@@ -34,24 +38,65 @@ class ViewInteraction extends ViewRecord
 
           $message = "Hola {$this->record->customer->first_name}, te contacto desde {$sourceName} por tu consulta sobre {$serviceName}.";
 
-        $this->record->events()->create([
-          'user_id' => auth()->id(),
-          'type' => 'whatsapp_opened',
-          'description' => 'Conversación de WhatsApp iniciada',
-          'new_value' => $phone,
-          'metadata' => [
-            'phone' => $phone,
-            'message' => $message,
-          ],
-        ]);
+          $this->record->events()->create([
+            'user_id' => auth()->id(),
+            'type' => 'whatsapp_opened',
+            'description' => 'Conversación de WhatsApp iniciada',
+            'new_value' => $phone,
+            'metadata' => [
+              'phone' => $phone,
+              'message' => $message,
+            ],
+          ]);
 
           return redirect()->away(
-            'https://wa.me/' . $phone . '?text=' . urlencode($message),
-            
+            'https://wa.me/' . $phone . '?text=' . urlencode($message)
           );
         }),
-      EditAction::make(),
 
+      Action::make('createBooking')
+        ->label('Crear reserva')
+        ->icon('heroicon-o-calendar-days')
+        ->color('primary')
+        ->form([
+          DateTimePicker::make('starts_at')
+            ->label('Inicio')
+            ->seconds(false)
+            ->required(),
+
+          DateTimePicker::make('ends_at')
+            ->label('Fin')
+            ->seconds(false),
+
+          Select::make('status')
+            ->label('Estado')
+            ->options([
+              'pendiente' => 'Pendiente',
+              'confirmada' => 'Confirmada',
+              'cancelada' => 'Cancelada',
+              'realizada' => 'Realizada',
+            ])
+            ->default('pendiente')
+            ->required(),
+
+          Textarea::make('notes')
+            ->label('Notas internas')
+            ->rows(4),
+        ])
+        ->action(function (array $data): void {
+          Booking::create([
+            'customer_id' => $this->record->customer_id,
+            'interaction_id' => $this->record->id,
+            'source_id' => $this->record->source_id,
+            'service_id' => $this->record->service_id,
+            'starts_at' => $data['starts_at'],
+            'ends_at' => $data['ends_at'] ?? null,
+            'status' => $data['status'],
+            'notes' => $data['notes'] ?? null,
+          ]);
+        }),
+
+      EditAction::make(),
     ];
   }
 

@@ -391,9 +391,10 @@ Preparar Aurora para equipos.
 # 🔮 Ideas futuras
 
 - [ ] Que adminitrador total añada campos nuevos en cada recurso
-- [ ] Reserva desde la interacción
 - [ ] Timeline para todos
 - [ ] Emails automáticos
+- [ ] Españolizar
+- [ ] Mejorar diseño y colores
 - [ ] Pipeline comercial tipo Kanban
 - [ ] Integración con Telegram
 - [ ] Integración con Stripe

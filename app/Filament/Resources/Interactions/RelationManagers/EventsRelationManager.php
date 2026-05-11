@@ -25,6 +25,7 @@ class EventsRelationManager extends RelationManager
           ->label('Tipo')
           ->badge()
           ->formatStateUsing(fn(string $state): string => match ($state) {
+            'whatsapp_opened' => 'WhatsApp iniciado',
             'status_changed' => 'Cambio de estado',
             'note_updated' => 'Nota actualizada',
             'booking_created' => 'Reserva creada',
@@ -33,6 +34,7 @@ class EventsRelationManager extends RelationManager
             default => $state,
           })
           ->color(fn(string $state): string => match ($state) {
+            'whatsapp_opened' => 'success',
             'status_changed' => 'info',
             'note_updated' => 'gray',
             'booking_created' => 'success',
