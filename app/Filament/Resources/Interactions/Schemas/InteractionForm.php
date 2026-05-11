@@ -6,7 +6,7 @@ use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
 use App\Models\Service;
 use Filament\Forms\Components\Textarea;
-
+use Filament\Forms\Components\Hidden;
 class InteractionForm
 {
     // app/Filament/Resources/Interactions/Schemas/InteractionForm.php
@@ -58,6 +58,8 @@ class InteractionForm
                     ->required(),
                 Textarea::make('notes')
                     ->label('Notas internas'),
+                Hidden::make('origin_type')
+                    ->default('manual'),
             ]);
     }
 }

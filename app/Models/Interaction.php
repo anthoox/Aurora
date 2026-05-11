@@ -15,6 +15,7 @@ class Interaction extends Model
         'source_id',
         'service_id',
         'status',
+        'origin_type',
         'message',
         'notes',
     ];

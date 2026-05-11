@@ -82,7 +82,14 @@ class ViewInteraction extends ViewRecord
           Textarea::make('notes')
             ->label('Notas internas')
             ->rows(4),
+            
         ])
+        ->disabled(fn() => $this->record->bookings()->exists())
+        ->tooltip(
+          fn() => $this->record->bookings()->exists()
+          ? 'Este lead ya tiene una reserva asociada'
+          : 'Crear reserva para este lead'
+        )
         ->action(function (array $data): void {
           Booking::create([
             'customer_id' => $this->record->customer_id,
