@@ -208,7 +208,7 @@ Permitir que cada web tenga servicios personalizados.
 - [x] Servicios asociados a cada Source
 - [x] Precios personalizados
 - [x] Descripciones
-- [ ] Filtrado automático por web
+- [x] Filtrado automático por web
 
 ### Aprendizajes
 - Relaciones many-to-many
