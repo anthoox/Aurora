@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\Bookings\Schemas;
 
+use App\Models\Service;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class BookingForm
@@ -13,23 +15,85 @@ class BookingForm
     {
         return $schema
             ->components([
-                TextInput::make('customer_id')
-                    ->required()
-                    ->numeric(),
-                TextInput::make('interaction_id')
-                    ->numeric(),
-                TextInput::make('service_id')
-                    ->numeric(),
-                TextInput::make('source_id')
-                    ->numeric(),
-                DateTimePicker::make('starts_at')
-                    ->required(),
-                DateTimePicker::make('ends_at'),
-                TextInput::make('status')
-                    ->required()
-                    ->default('pendiente'),
-                Textarea::make('notes')
-                    ->columnSpanFull(),
+                Section::make('Datos principales')
+                    ->schema([
+                        Select::make('customer_id')
+                            ->label('Cliente')
+                            ->relationship('customer', 'email')
+                            ->searchable()
+                            ->preload()
+                            ->required(),
+
+                        Select::make('interaction_id')
+                            ->label('Lead relacionado')
+                            ->relationship('interaction', 'id')
+                            ->searchable()
+                            ->preload()
+                            ->placeholder('Sin lead relacionado'),
+
+                        Select::make('source_id')
+                            ->label('Origen')
+                            ->relationship('source', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->required()
+                            ->live()
+                            ->afterStateUpdated(fn($set) => $set('service_id', null)),
+
+                        Select::make('service_id')
+                            ->label('Servicio')
+                            ->options(function ($get) {
+                                $sourceId = $get('source_id');
+
+                                if (!$sourceId) {
+                                    return [];
+                                }
+
+                                return Service::query()
+                                    ->whereHas('sources', function ($query) use ($sourceId) {
+                                        $query
+                                            ->where('sources.id', $sourceId)
+                                            ->where('service_source.is_active', true);
+                                    })
+                                    ->pluck('name', 'id');
+                            })
+                            ->searchable()
+                            ->preload()
+                            ->placeholder('Selecciona primero un origen'),
+                    ])
+                    ->columns(2),
+
+                Section::make('Fecha y estado')
+                    ->schema([
+                        DateTimePicker::make('starts_at')
+                            ->label('Inicio')
+                            ->seconds(false)
+                            ->required(),
+
+                        DateTimePicker::make('ends_at')
+                            ->label('Fin')
+                            ->seconds(false),
+
+                        Select::make('status')
+                            ->label('Estado')
+                            ->options([
+                                'pendiente' => 'Pendiente',
+                                'confirmada' => 'Confirmada',
+                                'cancelada' => 'Cancelada',
+                                'realizada' => 'Realizada',
+                            ])
+                            ->default('pendiente')
+                            ->required(),
+                    ])
+                    ->columns(3),
+
+                Section::make('Notas')
+                    ->schema([
+                        Textarea::make('notes')
+                            ->label('Notas internas')
+                            ->rows(4)
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 }

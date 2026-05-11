@@ -20,15 +20,15 @@ class BookingsTable
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('service.name')
-                    ->label('Servicio')
-                    ->placeholder('Sin servicio')
-                    ->sortable(),
-
                 TextColumn::make('source.name')
                     ->label('Origen')
                     ->badge()
                     ->placeholder('Sin origen')
+                    ->sortable(),
+
+                TextColumn::make('service.name')
+                    ->label('Servicio')
+                    ->placeholder('Sin servicio')
                     ->sortable(),
 
                 TextColumn::make('starts_at')
@@ -52,7 +52,6 @@ class BookingsTable
                         'realizada' => 'info',
                         default => 'gray',
                     }),
-
                 TextColumn::make('created_at')
                     ->label('Creada')
                     ->dateTime('d/m/Y H:i')

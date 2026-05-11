@@ -18,6 +18,7 @@ class Booking extends Model
         'status',
         'notes',
     ];
+
     protected $casts = [
         'starts_at' => 'datetime',
         'ends_at' => 'datetime',
