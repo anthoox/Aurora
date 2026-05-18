@@ -223,9 +223,9 @@ Permitir que cada web tenga servicios personalizados.
 Gestionar citas y reservas desde el CRM.
 
 ### Funcionalidades
-- [ ] Crear reservas
-- [ ] Fecha y hora
-- [ ] Estado de reserva:
+- [x] Crear reservas
+- [x] Fecha y hora
+- [x] Estado de reserva:
   - Pendiente
   - Confirmada
   - Cancelada
