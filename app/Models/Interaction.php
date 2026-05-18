@@ -3,11 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Observers\InteractionObserver;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[ObservedBy(InteractionObserver::class)]
 class Interaction extends Model
 {
     protected $fillable = [
