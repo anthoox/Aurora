@@ -66,6 +66,7 @@ class InteractionResource extends Resource
                                 'nuevo' => 'gray',
                                 'contactado' => 'info',
                                 'vendido' => 'success',
+                                'reservado' => 'warning',
                                 'descartado' => 'danger',
                                 default => 'gray',
                             }),

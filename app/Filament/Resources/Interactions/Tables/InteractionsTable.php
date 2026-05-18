@@ -57,10 +57,17 @@ class InteractionsTable
                     ->color(fn(string $state): string => match ($state) {
                         'nuevo' => 'gray',
                         'contactado' => 'info',
+                        'reservado' => 'warning',
                         'vendido' => 'success',
                         'descartado' => 'danger',
                         default => 'gray',
                     }),
+                TextColumn::make('bookings_count')
+                    ->label('Reserva')
+                    ->counts('bookings')
+                    ->formatStateUsing(fn($state) => $state > 0 ? 'Con reserva' : 'Sin reserva')
+                    ->badge()
+                    ->color(fn($state) => $state > 0 ? 'success' : 'gray'),
 
                 TextColumn::make('created_at')
                     ->label('Fecha')

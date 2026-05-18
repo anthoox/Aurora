@@ -51,6 +51,7 @@ class InteractionForm
                     ->options([
                         'nuevo' => 'Nuevo',
                         'contactado' => 'Contactado',
+                        'reservado' => 'Reservado',
                         'vendido' => 'Vendido',
                         'descartado' => 'Descartado',
                     ])

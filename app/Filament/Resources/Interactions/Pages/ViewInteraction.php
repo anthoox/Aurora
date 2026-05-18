@@ -101,6 +101,10 @@ class ViewInteraction extends ViewRecord
             'status' => $data['status'],
             'notes' => $data['notes'] ?? null,
           ]);
+
+          $this->record->update([
+            'status' => 'reservado',
+          ]);
         }),
 
       EditAction::make(),
