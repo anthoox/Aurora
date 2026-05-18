@@ -241,7 +241,7 @@ Gestionar citas y reservas desde el CRM.
 ## 8. Integración con Google Calendar
 
 ### Objetivo
-Sincronizar automáticamente las reservas.
+Sincronizar automáticamente las reservas. Cada empresa tendria sun propia cuenta de google cloud -calendar para funcionar y agregarlo al calendar-service-account
 
 ### Funcionalidades
 - [ ] Crear evento en Google Calendar
