@@ -67,28 +67,24 @@ class InteractionObserver
             ]);
         }
 
-        if ($interaction->wasChanged('notes')) {
-            $oldNotes = $interaction->getOriginal('notes');
-            $newNotes = $interaction->notes;
+        if ($interaction->wasChanged('status')) {
+            $oldStatus = $interaction->getOriginal('status');
+            $newStatus = $interaction->status;
 
             $recentDuplicate = $interaction->events()
-                ->where('type', 'note_updated')
-                ->where('old_value', $oldNotes ? Str::limit($oldNotes, 100) : null)
-                ->where('new_value', $newNotes ? Str::limit($newNotes, 100) : null)
+                ->where('type', 'status_changed')
+                ->where('old_value', $oldStatus)
+                ->where('new_value', $newStatus)
                 ->where('created_at', '>=', now()->subSeconds(5))
                 ->exists();
 
             if (!$recentDuplicate) {
                 $interaction->events()->create([
                     'user_id' => auth()->id(),
-                    'type' => 'note_updated',
-                    'description' => 'Notas internas actualizadas',
-                    'old_value' => $oldNotes
-                        ? Str::limit($oldNotes, 100)
-                        : null,
-                    'new_value' => $newNotes
-                        ? Str::limit($newNotes, 100)
-                        : null,
+                    'type' => 'status_changed',
+                    'description' => "Estado cambiado de {$oldStatus} a {$newStatus}",
+                    'old_value' => $oldStatus,
+                    'new_value' => $newStatus,
                 ]);
             }
         }
