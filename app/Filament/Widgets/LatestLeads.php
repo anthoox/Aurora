@@ -37,7 +37,7 @@ class LatestLeads extends TableWidget
                     ->label('Origen')
                     ->badge()
                     ->color('gray'),
-                TextColumn::make('service_id')
+                TextColumn::make('service.name')
                     ->label('Servicio')
                     ->placeholder('No especificado'),
                 TextColumn::make('status')
@@ -46,7 +46,9 @@ class LatestLeads extends TableWidget
                     ->color(fn(string $state): string => match ($state) {
                         'nuevo' => 'info',
                         'contactado' => 'warning',
-                        'convertido' => 'success',
+                        'reservado' => 'primary',
+                        'vendido' => 'success',
+                        'descartado' => 'danger',
                         default => 'gray',
                     }),
             ])
@@ -55,7 +57,7 @@ class LatestLeads extends TableWidget
                 Action::make('view')
                     ->label('Ver')
                     ->icon('heroicon-m-eye')
-                    ->url(fn(Interaction $record): string => "/admin/interactions/{$record->getKey()}/edit"),
+                    ->url(fn(Interaction $record): string => "/admin/interactions/{$record->getKey()}")
             ]);
     }
 }

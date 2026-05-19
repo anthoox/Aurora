@@ -307,9 +307,8 @@ Centralizar mensajes enviados al cliente.
 Evitar perder leads.
 
 ### Funcionalidades
-- [ ] Leads pendientes de seguimiento
-- [ ] Leads sin respuesta en X horas
-- [ ] Alertas internas
+- [X] Leads pendientes de seguimiento
+- [X] Leads sin respuesta en 24 horas
 - [ ] Dashboard comercial
 
 ### Aprendizajes
@@ -398,6 +397,7 @@ Preparar Aurora para equipos.
 - [ ] Emails automáticos
 - [ ] Españolizar
 - [ ] Mejorar diseño y colores
+- [ ] Alertas internas
 - [ ] Pipeline comercial tipo Kanban
 - [ ] Integración con Telegram
 - [ ] Integración con Stripe
