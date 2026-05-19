@@ -38,7 +38,7 @@ class ViewInteraction extends ViewRecord
           ? 'Este cliente no tiene teléfono registrado'
           : 'Contactar por WhatsApp'
         )
-        ->action(function () {
+        ->url(function () {
           $phone = preg_replace('/\D+/', '', $this->record->customer->phone);
 
           $serviceName = $this->record->service?->name ?? 'tu consulta';
@@ -46,6 +46,7 @@ class ViewInteraction extends ViewRecord
 
           $message = "Hola {$this->record->customer->first_name}, te contacto desde {$sourceName} por tu consulta sobre {$serviceName}.";
 
+          // timeline
           $this->record->events()->create([
             'user_id' => auth()->id(),
             'type' => 'whatsapp_opened',
@@ -55,19 +56,18 @@ class ViewInteraction extends ViewRecord
               'phone' => $phone,
               'message' => $message,
             ],
-            
           ]);
 
+          // automatización comercial
           if ($this->record->status === 'nuevo') {
             $this->record->update([
               'status' => 'contactado',
             ]);
-          };
+          }
 
-          return redirect()->away(
-            'https://wa.me/' . $phone . '?text=' . urlencode($message)
-          );
-        }),
+          return 'https://wa.me/' . $phone . '?text=' . urlencode($message);
+        })
+        ->openUrlInNewTab(),
 
       Action::make('createBooking')
         ->label('Crear reserva')
