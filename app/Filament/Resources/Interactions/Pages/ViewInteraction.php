@@ -9,10 +9,12 @@ use Filament\Actions\EditAction;
 use Filament\Actions\Action;
 use Illuminate\Support\Str;
 use App\Models\Booking;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use App\Filament\Resources\Bookings\BookingResource;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\TimePicker;
+use Carbon\Carbon;
 class ViewInteraction extends ViewRecord
 {
   protected static string $resource = InteractionResource::class;
@@ -74,14 +76,21 @@ class ViewInteraction extends ViewRecord
         ->icon('heroicon-o-calendar-days')
         ->color('primary')
         ->form([
-          DateTimePicker::make('starts_at')
-            ->label('Inicio')
-            ->seconds(false)
+          DatePicker::make('booking_date')
+            ->label('Fecha')
+            ->native(false)
             ->required(),
 
-          DateTimePicker::make('ends_at')
-            ->label('Fin')
-            ->seconds(false),
+          TimePicker::make('start_time')
+            ->label('Hora inicio')
+            ->seconds(false)
+            ->native(false)
+            ->required(),
+
+          TimePicker::make('end_time')
+            ->label('Hora fin')
+            ->seconds(false)
+            ->native(false),
 
           Select::make('status')
             ->label('Estado')
@@ -97,7 +106,6 @@ class ViewInteraction extends ViewRecord
           Textarea::make('notes')
             ->label('Notas internas')
             ->rows(4),
-            
         ])
         ->disabled(fn() => $this->record->bookings()->exists())
         ->tooltip(
@@ -106,13 +114,19 @@ class ViewInteraction extends ViewRecord
           : 'Crear reserva para este lead'
         )
         ->action(function (array $data): void {
+          $startsAt = Carbon::parse($data['booking_date'] . ' ' . $data['start_time']);
+
+          $endsAt = filled($data['end_time'] ?? null)
+            ? Carbon::parse($data['booking_date'] . ' ' . $data['end_time'])
+            : null;
+
           Booking::create([
             'customer_id' => $this->record->customer_id,
             'interaction_id' => $this->record->id,
             'source_id' => $this->record->source_id,
             'service_id' => $this->record->service_id,
-            'starts_at' => $data['starts_at'],
-            'ends_at' => $data['ends_at'] ?? null,
+            'starts_at' => $startsAt,
+            'ends_at' => $endsAt,
             'status' => $data['status'],
             'notes' => $data['notes'] ?? null,
           ]);

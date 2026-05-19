@@ -273,7 +273,7 @@ Actualizar automáticamente estados del lead.
 ### Funcionalidades
 - [x] Primer contacto → Contactado
 - [x] Reserva creada → Reservado
-- [ ] Reserva finalizada → Convertido
+- [x] Reserva finalizada → Convertido
 
 ### Aprendizajes
 - Eventos
