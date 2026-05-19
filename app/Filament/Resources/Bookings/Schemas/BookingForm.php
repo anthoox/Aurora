@@ -30,7 +30,9 @@ class BookingForm
                             ->relationship('interaction', 'id')
                             ->searchable()
                             ->preload()
-                            ->placeholder('Sin lead relacionado'),
+                            ->visible(fn($record) => filled($record?->interaction_id))
+                            ->disabled()
+                            ->dehydrated(),
 
                         Select::make('source_id')
                             ->label('Origen')
