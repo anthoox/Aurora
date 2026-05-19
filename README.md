@@ -288,9 +288,11 @@ Actualizar automáticamente estados del lead.
 Centralizar mensajes enviados al cliente.
 
 ### Funcionalidades
-- [ ] Historial de WhatsApps
-- [ ] Historial de emails
-
+- [-] Historial de WhatsApps
+- [-] Historial de emails
+- [x] Añadir botón para enviar email desde interacción y cliente
+- [x] Notas internas
+- [x] Registro de actividad
 
 ### Aprendizajes
 - Arquitectura de comunicaciones
