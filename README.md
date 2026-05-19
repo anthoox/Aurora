@@ -328,13 +328,11 @@ Convertir Aurora en una herramienta de análisis comercial.
 ## 12. Dashboard avanzado
 
 ### Métricas
-- [ ] Leads mensuales
-- [ ] Conversión por web
+- [x] Leads mensuales
+- [x] Conversión por web
 - [ ] Conversión por servicio
-- [ ] Leads vendidos
 - [x] Leads pendientes
-- [ ] Servicios más vendidos
-- [ ] Webs más rentables
+- [x] Servicios más vendidos
 
 ### Aprendizajes
 - Analytics

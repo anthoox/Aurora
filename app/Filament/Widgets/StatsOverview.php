@@ -43,16 +43,16 @@ class StatsOverview extends BaseWidget
 
         $totalLeads = Interaction::count();
 
+        $leadsMensuales = Interaction::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+
         $tasaConversion = $totalLeads > 0
             ? round(($leadsVendidos / $totalLeads) * 100, 1)
             : 0;
 
         return [
-            Stat::make('Total Leads', Interaction::count())
-                ->description('Histórico acumulado')
-                ->descriptionIcon('heroicon-m-chart-bar')
-                ->chart($trendData) // <-- ¡Datos reales aquí!
-                ->color('success'),
+
 
             // Stat::make('Clientes Únicos', Customer::count())
             //     ->description('Base de datos total')
@@ -69,7 +69,10 @@ class StatsOverview extends BaseWidget
             //     ->descriptionIcon('heroicon-m-user-plus')
             //     ->color($clientesNuevosHoy > 0 ? 'warning' : 'gray'),
 
-
+            Stat::make('Leads mensuales', $leadsMensuales)
+                ->description('Entradas del mes actual')
+                ->descriptionIcon('heroicon-m-calendar')
+                ->color('primary'),
 
 
             // Stat::make('Fuentes Activas', Source::where('is_active', true)->count())
