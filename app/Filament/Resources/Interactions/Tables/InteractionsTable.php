@@ -15,6 +15,7 @@ use Filament\Tables\Filters\Filter;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\Bookings\BookingResource;
 use Filament\Actions\Action;
+
 class InteractionsTable
 {
     public static function configure(Table $table): Table
@@ -45,6 +46,24 @@ class InteractionsTable
                     ->label('Origen')
                     ->badge() // Le da un estilo visual de etiqueta
                     ->sortable(),
+                TextColumn::make('follow_up_status')
+                    ->label('Seguimiento')
+                    ->state(function ($record): string {
+                        if (
+                            in_array($record->status, ['nuevo', 'contactado'])
+                            && !$record->bookings()->exists()
+                            && $record->updated_at <= now()->subHours(24)
+                        ) {
+                            return 'Pendiente';
+                        }
+
+                        return 'OK';
+                    })
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'Pendiente' => 'warning',
+                        default => 'gray',
+                    }),
 
                 // Mostramos el servicio
                 TextColumn::make('service.name')
@@ -126,6 +145,14 @@ class InteractionsTable
                 Filter::make('descartados')
                     ->label('Descartados')
                     ->query(fn(Builder $query): Builder => $query->where('status', 'descartado')),
+                Filter::make('pending_follow_up')
+                    ->label('Pendientes de seguimiento')
+                    ->query(
+                        fn(Builder $query): Builder => $query
+                            ->whereIn('status', ['nuevo', 'contactado'])
+                            ->whereDoesntHave('bookings')
+                            ->where('updated_at', '<=', now()->subHours(24))
+                    ),
             ])
             ->actions([
                 Action::make('viewBooking')
