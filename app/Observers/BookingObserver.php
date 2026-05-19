@@ -125,6 +125,12 @@ class BookingObserver
                     ]);
                 }
             }
+
+            if ($booking->status === 'realizada' && $booking->interaction) {
+                $booking->interaction->update([
+                    'status' => 'vendido',
+                ]);
+            }
         }
     }
 

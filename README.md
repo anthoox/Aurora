@@ -271,8 +271,8 @@ Automatizar tareas repetitivas y mejorar seguimiento comercial.
 Actualizar automáticamente estados del lead.
 
 ### Funcionalidades
-- [ ] Primer contacto → Contactado
-- [ ] Reserva creada → Reservado
+- [x] Primer contacto → Contactado
+- [x] Reserva creada → Reservado
 - [ ] Reserva finalizada → Convertido
 
 ### Aprendizajes
@@ -392,6 +392,7 @@ Preparar Aurora para equipos.
 # 🔮 Ideas futuras
 
 - [ ] Que adminitrador total añada campos nuevos en cada recurso
+- [ ] Enviar email tras confirmar reserva.
 - [ ] Timeline para todos
 - [ ] Emails automáticos
 - [ ] Españolizar
