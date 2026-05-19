@@ -14,22 +14,20 @@ class BookingObserver
      */
     public function created(Booking $booking): void
     {
-        if (!$booking->interaction) {
-            return;
+        if ($booking->interaction) {
+            $booking->interaction->events()->create([
+                'user_id' => auth()->id(),
+                'type' => 'booking_created',
+                'description' => 'Reserva creada',
+                'new_value' => $booking->starts_at?->format('d/m/Y H:i'),
+                'metadata' => [
+                    'booking_id' => $booking->id,
+                    'starts_at' => $booking->starts_at,
+                    'ends_at' => $booking->ends_at,
+                    'status' => $booking->status,
+                ],
+            ]);
         }
-
-        $booking->interaction->events()->create([
-            'user_id' => auth()->id(),
-            'type' => 'booking_created',
-            'description' => 'Reserva creada',
-            'new_value' => $booking->starts_at?->format('d/m/Y H:i'),
-            'metadata' => [
-                'booking_id' => $booking->id,
-                'starts_at' => $booking->starts_at,
-                'ends_at' => $booking->ends_at,
-                'status' => $booking->status,
-            ],
-        ]);
 
         if ($booking->status === 'confirmada') {
             try {
