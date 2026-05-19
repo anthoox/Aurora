@@ -15,6 +15,11 @@ class BookingsTable
     {
         return $table
             ->columns([
+                TextColumn::make('id')
+                    ->label('Reserva')
+                    ->formatStateUsing(fn($state) => 'RES-' . $state)
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('customer.email')
                     ->label('Cliente')
                     ->searchable()
