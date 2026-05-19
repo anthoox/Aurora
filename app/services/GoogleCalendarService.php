@@ -86,4 +86,30 @@ Notas:
       $googleEventId
     );
   }
+
+  public function updateEventFromBooking(Booking $booking): void
+  {
+    if (!$booking->google_event_id) {
+      return;
+    }
+
+    $event = new Event([
+      'summary' => $this->buildSummary($booking),
+      'description' => $this->buildDescription($booking),
+      'start' => new EventDateTime([
+        'dateTime' => $booking->starts_at->toRfc3339String(),
+        'timeZone' => config('app.timezone'),
+      ]),
+      'end' => new EventDateTime([
+        'dateTime' => ($booking->ends_at ?? $booking->starts_at->copy()->addHour())->toRfc3339String(),
+        'timeZone' => config('app.timezone'),
+      ]),
+    ]);
+
+    $this->calendar->events->update(
+      $this->calendarId,
+      $booking->google_event_id,
+      $event
+    );
+  }
 }

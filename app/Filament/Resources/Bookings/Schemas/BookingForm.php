@@ -25,6 +25,13 @@ class BookingForm
                             ->preload()
                             ->required(),
 
+                        Select::make('interaction_id')
+                            ->label('Lead relacionado')
+                            ->relationship('interaction', 'id')
+                            ->searchable()
+                            ->preload()
+                            ->placeholder('Sin lead relacionado'),
+
                         Select::make('source_id')
                             ->label('Origen')
                             ->relationship('source', 'name')

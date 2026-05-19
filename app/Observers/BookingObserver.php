@@ -66,12 +66,6 @@ class BookingObserver
                     ],
                 ]);
             }
-
-            if ($booking->status === 'realizada' && $booking->interaction) {
-                $booking->interaction->update([
-                    'status' => 'vendido',
-                ]);
-            }
         }
 
         if ($booking->wasChanged('status')) {
@@ -86,7 +80,6 @@ class BookingObserver
                         'booking_id' => $booking->id,
                         'field' => 'status',
                     ],
-                    
                 ]);
             }
 
@@ -130,8 +123,27 @@ class BookingObserver
                 ]);
             }
         }
-    }
 
+        if (
+            $booking->google_event_id &&
+            $booking->status === 'confirmada' &&
+            $booking->wasChanged('notes')
+        ) {
+            try {
+                app(GoogleCalendarService::class)
+                    ->updateEventFromBooking($booking);
+
+                $booking->updateQuietly([
+                    'google_synced_at' => now(),
+                ]);
+            } catch (\Throwable $e) {
+                Log::error('Error al actualizar notas en Google Calendar', [
+                    'booking_id' => $booking->id,
+                    'message' => $e->getMessage(),
+                ]);
+            }
+        }
+    }
     /**
      * Handle the Booking "deleted" event.
      */
