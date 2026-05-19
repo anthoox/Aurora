@@ -6,6 +6,7 @@ use App\Filament\Resources\Bookings\BookingResource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
+use Carbon\Carbon;
 
 class EditBooking extends EditRecord
 {
@@ -17,5 +18,17 @@ class EditBooking extends EditRecord
             ViewAction::make(),
             DeleteAction::make(),
         ];
+    }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        $startsAt = Carbon::parse($data['booking_date'] . ' ' . $data['start_time']);
+
+        $data['starts_at'] = $startsAt;
+        $data['ends_at'] = $startsAt->copy()->addHours((int) $data['duration_hours']);
+
+        unset($data['booking_date'], $data['start_time'], $data['duration_hours']);
+
+        return $data;
     }
 }

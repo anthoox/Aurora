@@ -82,16 +82,47 @@ class ViewInteraction extends ViewRecord
             ->required()
             ->minDate(now()),
 
-          TimePicker::make('start_time')
+          Select::make('start_time')
             ->label('Hora inicio')
-            ->seconds(false)
-            ->native(false)
+            ->options([
+              '09:00' => '09:00',
+              '09:30' => '09:30',
+              '10:00' => '10:00',
+              '10:30' => '10:30',
+              '11:00' => '11:00',
+              '11:30' => '11:30',
+              '12:00' => '12:00',
+              '12:30' => '12:30',
+              '13:00' => '13:00',
+              '13:30' => '13:30',
+              '14:00' => '14:00',
+              '14:30' => '14:30',
+              '15:00' => '15:00',
+              '15:30' => '15:30',
+              '16:00' => '16:00',
+              '16:30' => '16:30',
+              '17:00' => '17:00',
+              '17:30' => '17:30',
+              '18:00' => '18:00',
+              '18:30' => '18:30',
+              '19:00' => '19:00',
+              '19:30' => '19:30',
+              '20:00' => '20:00',
+            ])
+            ->searchable()
             ->required(),
 
-          TimePicker::make('end_time')
-            ->label('Hora fin')
-            ->seconds(false)
-            ->native(false),
+          Select::make('duration_hours')
+            ->label('Duración')
+            ->options([
+              1 => '1 hora',
+              2 => '2 horas',
+              3 => '3 horas',
+              4 => '4 horas',
+              5 => '5 horas',
+            ])
+            ->default(1)
+            ->required(),
 
           Select::make('status')
             ->label('Estado')
@@ -117,9 +148,7 @@ class ViewInteraction extends ViewRecord
         ->action(function (array $data): void {
           $startsAt = Carbon::parse($data['booking_date'] . ' ' . $data['start_time']);
 
-          $endsAt = filled($data['end_time'] ?? null)
-            ? Carbon::parse($data['booking_date'] . ' ' . $data['end_time'])
-            : null;
+          $endsAt = $startsAt->copy()->addHours((int) $data['duration_hours']);
 
           Booking::create([
             'customer_id' => $this->record->customer_id,

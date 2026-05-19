@@ -3,11 +3,12 @@
 namespace App\Filament\Resources\Bookings\Schemas;
 
 use App\Models\Service;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Carbon\Carbon;
+use Filament\Forms\Components\DatePicker;
 
 class BookingForm
 {
@@ -65,14 +66,67 @@ class BookingForm
 
                 Section::make('Fecha y estado')
                     ->schema([
-                        DateTimePicker::make('starts_at')
-                            ->label('Inicio')
-                            ->seconds(false)
-                            ->required(),
+                        DatePicker::make('booking_date')
+                            ->label('Fecha')
+                            ->native(false)
+                            ->minDate(now())
+                            ->required()
+                            ->afterStateHydrated(function ($component, $record) {
+                                if ($record?->starts_at) {
+                                    $component->state($record->starts_at->toDateString());
+                                }
+                            }),
+                        Select::make('start_time')
+                            ->label('Hora inicio')
+                            ->options([
+                                '09:00' => '09:00',
+                                '09:30' => '09:30',
+                                '10:00' => '10:00',
+                                '10:30' => '10:30',
+                                '11:00' => '11:00',
+                                '11:30' => '11:30',
+                                '12:00' => '12:00',
+                                '12:30' => '12:30',
+                                '13:00' => '13:00',
+                                '13:30' => '13:30',
+                                '14:00' => '14:00',
+                                '14:30' => '14:30',
+                                '15:00' => '15:00',
+                                '15:30' => '15:30',
+                                '16:00' => '16:00',
+                                '16:30' => '16:30',
+                                '17:00' => '17:00',
+                                '17:30' => '17:30',
+                                '18:00' => '18:00',
+                                '18:30' => '18:30',
+                                '19:00' => '19:00',
+                                '19:30' => '19:30',
+                                '20:00' => '20:00',
+                            ])
+                            ->searchable()
+                            ->required()
+                            ->afterStateHydrated(function ($component, $record) {
+                                if ($record?->starts_at) {
+                                    $component->state($record->starts_at->format('H:i'));
+                                }
+                            }),
 
-                        DateTimePicker::make('ends_at')
-                            ->label('Fin')
-                            ->seconds(false),
+                        Select::make('duration_hours')
+                            ->label('Duración')
+                            ->options([
+                                1 => '1 hora',
+                                2 => '2 horas',
+                                3 => '3 horas',
+                                4 => '4 horas',
+                                5 => '5 horas',
+                            ])
+                            ->default(1)
+                            ->required()
+                            ->afterStateHydrated(function ($component, $record) {
+                                if ($record?->starts_at && $record?->ends_at) {
+                                    $component->state($record->starts_at->diffInHours($record->ends_at));
+                                }
+                            }),
 
                         Select::make('status')
                             ->label('Estado')
