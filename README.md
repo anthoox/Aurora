@@ -309,7 +309,7 @@ Evitar perder leads.
 ### Funcionalidades
 - [X] Leads pendientes de seguimiento
 - [X] Leads sin respuesta en 24 horas
-- [ ] Dashboard comercial
+- [x] Dashboard comercial
 
 ### Aprendizajes
 - Jobs
