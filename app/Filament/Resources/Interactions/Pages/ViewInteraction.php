@@ -79,7 +79,8 @@ class ViewInteraction extends ViewRecord
           DatePicker::make('booking_date')
             ->label('Fecha')
             ->native(false)
-            ->required(),
+            ->required()
+            ->minDate(now()),
 
           TimePicker::make('start_time')
             ->label('Hora inicio')
