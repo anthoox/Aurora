@@ -7,7 +7,7 @@ use Filament\Widgets\Widget;
 
 class TopServicesStats extends Widget
 {
-    protected static string $view = 'filament.widgets.top-services-stats';
+    protected string $view = 'filament.widgets.top-services-stats';
 
     protected int|string|array $columnSpan = 'full';
 
