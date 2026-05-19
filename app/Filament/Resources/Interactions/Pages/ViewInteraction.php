@@ -51,6 +51,28 @@ class ViewInteraction extends ViewRecord
           return 'https://wa.me/' . $phone . '?text=' . urlencode($message);
         })
         ->openUrlInNewTab(),
+      Action::make('email')
+        ->label('Email')
+        ->icon('heroicon-o-envelope')
+        ->color('info')
+        ->disabled(fn() => blank($this->record->customer->email))
+        ->tooltip(
+          fn() => blank($this->record->customer->email)
+          ? 'Este cliente no tiene email registrado'
+          : 'Contactar por email'
+        )
+        ->url(function () {
+          $serviceName = $this->record->service?->name ?? 'tu consulta';
+          $sourceName = $this->record->source?->name ?? 'nuestra web';
+
+          $subject = "Consulta sobre {$serviceName}";
+          $body = "Hola {$this->record->customer->first_name},\n\n"
+            . "Te contacto desde {$sourceName} por tu consulta sobre {$serviceName}.";
+
+          return 'mailto:' . $this->record->customer->email
+            . '?subject=' . rawurlencode($subject)
+            . '&body=' . rawurlencode($body);
+        }),
 
       Action::make('createBooking')
         ->label('Crear reserva')
@@ -149,12 +171,12 @@ class ViewInteraction extends ViewRecord
               'status' => 'reservado',
             ]);
           }
-          
+
         }),
 
       EditAction::make(),
     ];
   }
 
-  
+
 }

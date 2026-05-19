@@ -290,8 +290,7 @@ Centralizar mensajes enviados al cliente.
 ### Funcionalidades
 - [ ] Historial de WhatsApps
 - [ ] Historial de emails
-- [ ] Notas internas
-- [ ] Registro de actividad
+
 
 ### Aprendizajes
 - Arquitectura de comunicaciones
