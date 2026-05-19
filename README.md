@@ -248,7 +248,7 @@ Las reservas solo se envian si se crean confirmadas. No si
 - [x] Crear evento en Google Calendar
 - [ ] Enviar invitación al cliente
 - [x] Sincronización automática
-- [ ] Actualización de eventos
+- [x] Actualización de eventos
 
 ### Aprendizajes
 - APIs externas

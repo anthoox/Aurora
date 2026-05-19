@@ -47,7 +47,14 @@ class ViewInteraction extends ViewRecord
               'phone' => $phone,
               'message' => $message,
             ],
+            
           ]);
+          
+          if ($this->record->status === 'nuevo') {
+            $this->record->update([
+              'status' => 'contactado',
+            ]);
+          };
 
           return redirect()->away(
             'https://wa.me/' . $phone . '?text=' . urlencode($message)

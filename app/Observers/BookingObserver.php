@@ -68,6 +68,12 @@ class BookingObserver
                     ],
                 ]);
             }
+
+            if ($booking->status === 'realizada' && $booking->interaction) {
+                $booking->interaction->update([
+                    'status' => 'vendido',
+                ]);
+            }
         }
 
         if ($booking->wasChanged('status')) {
@@ -82,6 +88,7 @@ class BookingObserver
                         'booking_id' => $booking->id,
                         'field' => 'status',
                     ],
+                    
                 ]);
             }
 
