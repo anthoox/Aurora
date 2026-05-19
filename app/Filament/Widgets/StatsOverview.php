@@ -82,10 +82,10 @@ class StatsOverview extends BaseWidget
                 ->descriptionIcon('heroicon-m-exclamation-triangle')
                 ->color($leadsPendientes > 0 ? 'warning' : 'success'),
 
-            Stat::make('Reservas confirmadas', $reservasConfirmadas)
-                ->description('Total confirmadas')
-                ->descriptionIcon('heroicon-m-calendar-days')
-                ->color('success'),
+            // Stat::make('Reservas confirmadas', $reservasConfirmadas)
+            //     ->description('Total confirmadas')
+            //     ->descriptionIcon('heroicon-m-calendar-days')
+            //     ->color('success'),
 
             Stat::make('Reservas hoy', $reservasHoy)
                 ->description('Citas programadas para hoy')

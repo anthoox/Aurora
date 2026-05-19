@@ -332,8 +332,7 @@ Convertir Aurora en una herramienta de análisis comercial.
 - [ ] Conversión por web
 - [ ] Conversión por servicio
 - [ ] Leads vendidos
-- [ ] Leads pendientes
-- [ ] Tiempo medio de contacto
+- [x] Leads pendientes
 - [ ] Servicios más vendidos
 - [ ] Webs más rentables
 
