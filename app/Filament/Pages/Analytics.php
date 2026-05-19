@@ -21,6 +21,9 @@ class Analytics extends Page
     {
         return [
             \App\Filament\Widgets\SourceConversionStats::class,
+            \App\Filament\Widgets\TopServicesStats::class,
         ];
     }
+
+    
 }

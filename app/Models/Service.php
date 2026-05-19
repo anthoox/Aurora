@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-
+use App\Models\Booking;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -28,5 +28,10 @@ class Service extends Model
     public function interactions(): HasMany
     {
         return $this->hasMany(Interaction::class);
+    }
+
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
     }
 }
