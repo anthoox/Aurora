@@ -142,9 +142,14 @@ class ViewInteraction extends ViewRecord
             'notes' => $data['notes'] ?? null,
           ]);
 
-          $this->record->update([
-            'status' => 'reservado',
-          ]);
+
+
+          if (in_array($this->record->status, ['nuevo', 'contactado'])) {
+            $this->record->update([
+              'status' => 'reservado',
+            ]);
+          }
+          
         }),
 
       EditAction::make(),
