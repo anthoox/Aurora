@@ -4,6 +4,9 @@ namespace App\Observers;
 
 use App\Models\Booking;
 
+
+use App\Services\GoogleCalendarService;
+use Illuminate\Support\Facades\Log;
 class BookingObserver
 {
     /**
@@ -27,6 +30,21 @@ class BookingObserver
                 'status' => $booking->status,
             ],
         ]);
+
+        try {
+            $googleEventId = app(GoogleCalendarService::class)
+                ->createEventFromBooking($booking);
+
+            $booking->updateQuietly([
+                'google_event_id' => $googleEventId,
+                'google_synced_at' => now(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Error al crear evento en Google Calendar', [
+                'booking_id' => $booking->id,
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**
