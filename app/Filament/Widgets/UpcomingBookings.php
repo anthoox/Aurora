@@ -12,7 +12,7 @@ class UpcomingBookings extends TableWidget
 {
     protected static ?int $sort = 5;
 
-    protected int|string|array $columnSpan = 2;
+    protected int|string|array $columnSpan = 1;
 
     protected static ?string $heading = 'Próximas reservas';
 
@@ -32,17 +32,14 @@ class UpcomingBookings extends TableWidget
                     ->dateTime('d/m/Y H:i')
                     ->sortable(),
 
-                TextColumn::make('customer.first_name')
+                TextColumn::make('customer.email')
                     ->label('Cliente'),
 
-                TextColumn::make('service.name')
-                    ->label('Servicio')
-                    ->placeholder('Sin servicio'),
 
-                TextColumn::make('source.name')
-                    ->label('Origen')
-                    ->badge()
-                    ->color('gray'),
+                // TextColumn::make('source.name')
+                //     ->label('Origen')
+                //     ->badge()
+                //     ->color('gray'),
 
                 TextColumn::make('status')
                     ->label('Estado')

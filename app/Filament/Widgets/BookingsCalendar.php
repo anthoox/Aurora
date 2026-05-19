@@ -11,9 +11,9 @@ use Illuminate\Support\Collection;
 use Guava\Calendar\ValueObjects\CalendarEvent;
 class BookingsCalendar extends CalendarWidget
 {
-    protected static ?int $sort = 6;
+    protected static ?int $sort = 2;
 
-    protected int|string|array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 1;
 
     protected string|HtmlString|bool|null $heading = 'Calendario de reservas';
 
