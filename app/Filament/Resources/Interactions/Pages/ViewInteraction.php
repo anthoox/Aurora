@@ -12,7 +12,7 @@ use App\Models\Booking;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
-
+use App\Filament\Resources\Bookings\BookingResource;
 class ViewInteraction extends ViewRecord
 {
   protected static string $resource = InteractionResource::class;
@@ -20,6 +20,14 @@ class ViewInteraction extends ViewRecord
   protected function getHeaderActions(): array
   {
     return [
+      Action::make('viewBooking')
+        ->label('Ver reserva')
+        ->icon('heroicon-o-eye')
+        ->color('info')
+        ->visible(fn() => $this->record->bookings()->exists())
+        ->url(fn() => BookingResource::getUrl('view', [
+          'record' => $this->record->bookings()->latest()->first(),
+        ])),
       Action::make('whatsapp')
         ->label('WhatsApp')
         ->icon('heroicon-o-chat-bubble-left-right')
@@ -49,7 +57,7 @@ class ViewInteraction extends ViewRecord
             ],
             
           ]);
-          
+
           if ($this->record->status === 'nuevo') {
             $this->record->update([
               'status' => 'contactado',
