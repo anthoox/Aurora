@@ -78,4 +78,12 @@ Notas:
 {$booking->notes}
         ");
   }
+
+  public function deleteEvent(string $googleEventId): void
+  {
+    $this->calendar->events->delete(
+      $this->calendarId,
+      $googleEventId
+    );
+  }
 }

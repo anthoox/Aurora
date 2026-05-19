@@ -242,11 +242,12 @@ Gestionar citas y reservas desde el CRM.
 
 ### Objetivo
 Sincronizar automáticamente las reservas. Cada empresa tendria sun propia cuenta de google cloud -calendar para funcionar y agregarlo al calendar-service-account
-
+SE ha conseguido que funcione hasta registrar el evento para el dueño del email. aun no invita
+Las reservas solo se envian si se crean confirmadas. No si
 ### Funcionalidades
-- [ ] Crear evento en Google Calendar
+- [x] Crear evento en Google Calendar
 - [ ] Enviar invitación al cliente
-- [ ] Sincronización automática
+- [x] Sincronización automática
 - [ ] Actualización de eventos
 
 ### Aprendizajes
