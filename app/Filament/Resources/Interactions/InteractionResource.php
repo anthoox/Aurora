@@ -100,14 +100,18 @@ class InteractionResource extends Resource
                     ])
                     ->columns(2),
 
-                Section::make('Solicitud')
+                
+                Section::make('Resumen del lead')
                     ->schema([
-                        TextEntry::make('message')
-                            ->label('Mensaje del cliente')
-                            ->placeholder('Sin mensaje')
+                        TextEntry::make('catalog_price')
+                            ->label('Precio')
+                            ->money('EUR')
+                            ->placeholder('Sin precio configurado'),
+                        TextEntry::make('catalog_description')
+                            ->label('Descripción del servicio')
+                            ->placeholder('Sin descripción personalizada')
                             ->columnSpanFull(),
-                    ])                    ->columns(2),
-
+                    ])->columns(2),
 
                 Section::make('Gestión interna')
                     ->schema([
@@ -121,6 +125,14 @@ class InteractionResource extends Resource
                             ->dateTime('d/m/Y H:i'),
                     ])->columns(2),
 
+                Section::make('Solicitud')
+                    ->schema([
+                        TextEntry::make('message')
+                            ->label('Mensaje del cliente')
+                            ->placeholder('Sin mensaje')
+                            ->columnSpanFull(),
+                    ])->columns(2),
+                
                 Section::make('Cliente recurrente')
                     ->visible(
                         fn($record) =>
@@ -142,14 +154,6 @@ class InteractionResource extends Resource
                             }),
                     ])
                     ->compact(),
-                TextEntry::make('catalog_price')
-                    ->label('Precio')
-                    ->money('EUR')
-                    ->placeholder('Sin precio configurado'),
-                TextEntry::make('catalog_description')
-                    ->label('Descripción del servicio')
-                    ->placeholder('Sin descripción personalizada')
-                    ->columnSpanFull(),
-            ]);
+            ])->columns(2);
     }
 }

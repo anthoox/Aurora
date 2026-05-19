@@ -48,25 +48,6 @@ class ViewInteraction extends ViewRecord
 
           $message = "Hola {$this->record->customer->first_name}, te contacto desde {$sourceName} por tu consulta sobre {$serviceName}.";
 
-          // timeline
-          $this->record->events()->create([
-            'user_id' => auth()->id(),
-            'type' => 'whatsapp_opened',
-            'description' => 'Conversación de WhatsApp iniciada',
-            'new_value' => $phone,
-            'metadata' => [
-              'phone' => $phone,
-              'message' => $message,
-            ],
-          ]);
-
-          // automatización comercial
-          if ($this->record->status === 'nuevo') {
-            $this->record->update([
-              'status' => 'contactado',
-            ]);
-          }
-
           return 'https://wa.me/' . $phone . '?text=' . urlencode($message);
         })
         ->openUrlInNewTab(),
