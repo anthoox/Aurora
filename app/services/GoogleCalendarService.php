@@ -6,7 +6,6 @@ use App\Models\Booking;
 use Google\Client;
 use Google\Service\Calendar;
 use Google\Service\Calendar\Event;
-use Google\Service\Calendar\EventAttendee;
 use Google\Service\Calendar\EventDateTime;
 
 class GoogleCalendarService
@@ -19,11 +18,18 @@ class GoogleCalendarService
   {
     $client = new Client();
 
-    $client->setAuthConfig(config('services.google_calendar.credentials_path'));
+    $credentialsPath = base_path(config('services.google_calendar.credentials_path'));
+
+    if (!file_exists($credentialsPath)) {
+      dd('No existe el archivo: ' . $credentialsPath);
+    }
+
+    $client->setAuthConfig($credentialsPath);
     $client->addScope(Calendar::CALENDAR);
 
     $this->calendar = new Calendar($client);
     $this->calendarId = config('services.google_calendar.calendar_id');
+    
   }
 
   public function createEventFromBooking(Booking $booking): string
@@ -39,17 +45,11 @@ class GoogleCalendarService
         'dateTime' => ($booking->ends_at ?? $booking->starts_at->copy()->addHour())->toRfc3339String(),
         'timeZone' => config('app.timezone'),
       ]),
-      'attendees' => [
-        new EventAttendee([
-          'email' => $booking->customer->email,
-        ]),
-      ],
     ]);
 
     $createdEvent = $this->calendar->events->insert(
       $this->calendarId,
-      $event,
-      ['sendUpdates' => 'all']
+      $event
     );
 
     return $createdEvent->getId();

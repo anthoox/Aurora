@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'google_calendar' => [
+        'calendar_id' => env('GOOGLE_CALENDAR_ID'),
+        'credentials_path' => env('GOOGLE_CALENDAR_CREDENTIALS'),
+    ],
+
 ];
