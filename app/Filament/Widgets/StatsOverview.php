@@ -54,27 +54,18 @@ class StatsOverview extends BaseWidget
                 ->chart($trendData) // <-- ¡Datos reales aquí!
                 ->color('success'),
 
-            Stat::make('Clientes Únicos', Customer::count())
-                ->description('Base de datos total')
-                ->descriptionIcon('heroicon-m-users')
-                ->color('primary'),
+
 
             Stat::make('Leads de Hoy', $leadsHoy)
                 ->description($leadsHoy > 0 ? '¡Día productivo!' : 'Esperando entradas...')
                 ->descriptionIcon($leadsHoy > 0 ? 'heroicon-m-bolt' : 'heroicon-m-clock')
                 ->color($leadsHoy > 0 ? 'info' : 'gray'),
 
-            Stat::make('Nuevos Clientes Hoy', $clientesNuevosHoy)
-                ->description('Personas que no conocíamos')
-                ->descriptionIcon('heroicon-m-user-plus')
-                ->color($clientesNuevosHoy > 0 ? 'warning' : 'gray'),
 
 
 
 
-            Stat::make('Fuentes Activas', Source::where('is_active', true)->count())
-                ->description('Webs conectadas')
-                ->descriptionIcon('heroicon-m-globe-alt'),
+
 
 
                 Stat::make('Leads pendientes', $leadsPendientes)
@@ -82,10 +73,7 @@ class StatsOverview extends BaseWidget
     ->descriptionIcon('heroicon-m-exclamation-triangle')
     ->color($leadsPendientes > 0 ? 'warning' : 'success'),
 
-Stat::make('Reservas confirmadas', $reservasConfirmadas)
-    ->description('Total confirmadas')
-    ->descriptionIcon('heroicon-m-calendar-days')
-    ->color('success'),
+
 
 Stat::make('Reservas hoy', $reservasHoy)
     ->description('Citas programadas para hoy')
