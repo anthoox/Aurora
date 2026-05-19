@@ -13,7 +13,8 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Filters\Filter;
 use Illuminate\Database\Eloquent\Builder;
-
+use App\Filament\Resources\Bookings\BookingResource;
+use Filament\Actions\Action;
 class InteractionsTable
 {
     public static function configure(Table $table): Table
@@ -127,8 +128,19 @@ class InteractionsTable
                     ->query(fn(Builder $query): Builder => $query->where('status', 'descartado')),
             ])
             ->actions([
-                ViewAction::make(),
-                EditAction::make(),
+                Action::make('viewBooking')
+                    ->label('Reserva')
+                    ->icon('heroicon-o-calendar-days')
+                    ->color('info')
+                    ->visible(fn($record) => $record->bookings()->exists())
+                    ->url(fn($record) => BookingResource::getUrl('view', [
+                        'record' => $record->bookings()->latest()->first(),
+                    ])),
+                ViewAction::make()
+                    ->label('Ver'),
+                
+                EditAction::make()
+                    ->label('Editar'),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
