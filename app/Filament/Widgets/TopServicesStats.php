@@ -10,7 +10,7 @@ class TopServicesStats extends Widget
     protected string $view = 'filament.widgets.top-services-stats';
 
     protected int|string|array $columnSpan = 'full';
-
+    protected static bool $isDiscovered = false;
     public function getServices()
     {
         return Service::query()

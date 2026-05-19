@@ -10,7 +10,7 @@ class ServiceConversionStats extends Widget
     protected string $view = 'filament.widgets.service-conversion-stats';
 
     protected int|string|array $columnSpan = 'full';
-
+    protected static bool $isDiscovered = false;
     public function getServices()
     {
         return Service::query()

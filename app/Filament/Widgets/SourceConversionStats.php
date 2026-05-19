@@ -10,6 +10,7 @@ class SourceConversionStats extends Widget
     protected string $view = 'filament.widgets.source-conversion-stats';
 
     protected int|string|array $columnSpan = 'full';
+    protected static bool $isDiscovered = false;
 
     public function getSources()
     {

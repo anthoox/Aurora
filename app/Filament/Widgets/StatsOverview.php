@@ -54,10 +54,10 @@ class StatsOverview extends BaseWidget
         return [
 
 
-            // Stat::make('Clientes Únicos', Customer::count())
-            //     ->description('Base de datos total')
-            //     ->descriptionIcon('heroicon-m-users')
-            //     ->color('primary'),
+            Stat::make('Clientes Únicos', Customer::count())
+                ->description('Base de datos total')
+                ->descriptionIcon('heroicon-m-users')
+                ->color('primary'),
 
             Stat::make('Leads de Hoy', $leadsHoy)
                 ->description($leadsHoy > 0 ? '¡Día productivo!' : 'Esperando entradas...')
