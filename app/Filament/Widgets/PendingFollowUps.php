@@ -8,7 +8,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
 
-class LatestBookings extends TableWidget
+class PendingFollowUps extends TableWidget
 {
     protected static ?int $sort = 4;
 
