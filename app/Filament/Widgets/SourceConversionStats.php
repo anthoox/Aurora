@@ -23,7 +23,7 @@ class SourceConversionStats extends TableWidget
                 Source::query()
                     ->withCount([
                         'interactions',
-                        'interactions as vendidos_count' => fn(Builder $query) =>
+                        'interactions as vendidos_count' => fn (Builder $query) =>
                             $query->where('status', 'vendido'),
                     ])
             )
