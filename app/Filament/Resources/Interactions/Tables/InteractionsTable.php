@@ -2,19 +2,16 @@
 
 namespace App\Filament\Resources\Interactions\Tables;
 
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Table;
-use Filament\Actions\ViewAction;
-use Filament\Tables\Filters\SelectFilter;
-
-use Filament\Forms\Components\DatePicker;
-use Filament\Tables\Filters\Filter;
-use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\Bookings\BookingResource;
 use Filament\Actions\Action;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class InteractionsTable
 {
@@ -23,11 +20,15 @@ class InteractionsTable
         return $table
             ->columns([
                 TextColumn::make('id')
-                    ->label('Id')
-                    ->sortable(),
-                // Mostramos el email del cliente a través de la relación 'customer'
+                    ->label('ID')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('customer.email')
                     ->label('Cliente')
+                    ->description(fn($record): string => trim(
+                        "{$record->customer?->first_name} {$record->customer?->last_name}"
+                    ))
                     ->searchable(query: function (Builder $query, string $search): Builder {
                         return $query->whereHas('customer', function (Builder $query) use ($search) {
                             $query
@@ -38,14 +39,28 @@ class InteractionsTable
                         });
                     })
                     ->sortable(),
-                TextColumn::make('customer.first_name')
-                    ->label('Nombre')
-                    ->sortable(),
-                // Mostramos el nombre de la web de origen
+
                 TextColumn::make('source.name')
                     ->label('Origen')
-                    ->badge() // Le da un estilo visual de etiqueta
+                    ->badge()
                     ->sortable(),
+
+                TextColumn::make('origin_type')
+                    ->label('Entrada')
+                    ->badge()
+                    ->formatStateUsing(fn(?string $state): string => match ($state) {
+                        'api' => 'Web/API',
+                        'manual' => 'Manual',
+                        'booking' => 'Reserva',
+                        default => 'Manual',
+                    })
+                    ->color(fn(?string $state): string => match ($state) {
+                        'api' => 'success',
+                        'manual' => 'gray',
+                        'booking' => 'info',
+                        default => 'gray',
+                    }),
+
                 TextColumn::make('follow_up_status')
                     ->label('Seguimiento')
                     ->state(function ($record): string {
@@ -65,12 +80,10 @@ class InteractionsTable
                         default => 'gray',
                     }),
 
-                // Mostramos el servicio
                 TextColumn::make('service.name')
                     ->label('Servicio')
                     ->placeholder('Sin servicio'),
 
-                // Mostramos el estado con colores
                 TextColumn::make('status')
                     ->label('Estado')
                     ->badge()
@@ -82,6 +95,7 @@ class InteractionsTable
                         'descartado' => 'danger',
                         default => 'gray',
                     }),
+
                 TextColumn::make('bookings_count')
                     ->label('Reserva')
                     ->counts('bookings')
@@ -100,15 +114,27 @@ class InteractionsTable
                     ->options([
                         'nuevo' => 'Nuevo',
                         'contactado' => 'Contactado',
+                        'reservado' => 'Reservado',
                         'vendido' => 'Vendido',
                         'descartado' => 'Descartado',
                     ]),
+
                 SelectFilter::make('source_id')
                     ->label('Origen')
                     ->relationship('source', 'name'),
+
                 SelectFilter::make('service_id')
                     ->label('Servicio')
                     ->relationship('service', 'name'),
+
+                SelectFilter::make('origin_type')
+                    ->label('Entrada')
+                    ->options([
+                        'api' => 'Web/API',
+                        'manual' => 'Manual',
+                        'booking' => 'Reserva',
+                    ]),
+
                 Filter::make('created_at')
                     ->label('Fecha')
                     ->form([
@@ -131,9 +157,11 @@ class InteractionsTable
                                 $query->whereDate('created_at', '<=', $date),
                             );
                     }),
+
                 Filter::make('sin_contactar')
                     ->label('Sin contactar')
                     ->query(fn(Builder $query): Builder => $query->where('status', 'nuevo')),
+
                 Filter::make('contactados')
                     ->label('Contactados')
                     ->query(fn(Builder $query): Builder => $query->where('status', 'contactado')),
@@ -145,6 +173,7 @@ class InteractionsTable
                 Filter::make('descartados')
                     ->label('Descartados')
                     ->query(fn(Builder $query): Builder => $query->where('status', 'descartado')),
+
                 Filter::make('pending_follow_up')
                     ->label('Pendientes de seguimiento')
                     ->query(
@@ -163,16 +192,12 @@ class InteractionsTable
                     ->url(fn($record) => BookingResource::getUrl('view', [
                         'record' => $record->bookings()->latest()->first(),
                     ])),
+
                 ViewAction::make()
                     ->label('Ver'),
-                
+
                 EditAction::make()
                     ->label('Editar'),
-            ])
-            ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
             ]);
     }
 }
