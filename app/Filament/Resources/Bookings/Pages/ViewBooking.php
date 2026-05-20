@@ -60,7 +60,13 @@ class ViewBooking extends ViewRecord
                 }),
 
             EditAction::make()
-                ->visible(fn() => $this->record->canBeEdited()),
+                ->disabled(fn() => !$this->record->canBeEdited())
+                ->tooltip(
+                    fn() => $this->record->canBeEdited()
+                    ? 'Editar reserva'
+                    : 'Esta reserva no se puede editar por su estado o porque ya ha finalizado'
+                )
+                ->color(fn() => $this->record->canBeEdited() ? 'primary' : 'gray'),
         ];
     }
 }

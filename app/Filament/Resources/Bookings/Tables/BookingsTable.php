@@ -96,7 +96,13 @@ class BookingsTable
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make()
-                    ->visible(fn($record) => $record->canBeEdited()),
+                    ->disabled(fn($record) => !$record->canBeEdited())
+                    ->tooltip(
+                        fn($record) => $record->canBeEdited()
+                        ? 'Editar reserva'
+                        : 'Esta reserva no se puede editar por su estado o porque ya ha finalizado'
+                    )
+                    ->color(fn($record) => $record->canBeEdited() ? 'primary' : 'gray'),
             ]);
     }
 }
