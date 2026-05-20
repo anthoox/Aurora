@@ -68,7 +68,15 @@ class BookingsTable
                         'realizada' => 'info',
                         default => 'gray',
                     }),
-                    
+                TextColumn::make('booking_origin')
+                    ->label('Tipo')
+                    ->state(fn($record): string => $record->interaction_id ? 'Desde lead' : 'Manual')
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'Desde lead' => 'info',
+                        'Manual' => 'gray',
+                        default => 'gray',
+                    }),
                 TextColumn::make('created_at')
                     ->label('Creada')
                     ->dateTime('d/m/Y H:i')
