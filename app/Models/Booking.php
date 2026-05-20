@@ -45,6 +45,17 @@ class Booking extends Model
     {
         return $this->belongsTo(Source::class);
     }
+    public function canBeEdited(): bool
+    {
+        if (in_array($this->status, ['realizada', 'cancelada'])) {
+            return false;
+        }
 
+        if ($this->status === 'confirmada' && $this->ends_at && $this->ends_at->isPast()) {
+            return false;
+        }
+
+        return true;
+    }
     
 }

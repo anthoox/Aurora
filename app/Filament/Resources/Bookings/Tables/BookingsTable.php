@@ -95,7 +95,8 @@ class BookingsTable
             ])
             ->recordActions([
                 ViewAction::make(),
-                EditAction::make(),
+                EditAction::make()
+                    ->visible(fn($record) => $record->canBeEdited()),
             ]);
     }
 }

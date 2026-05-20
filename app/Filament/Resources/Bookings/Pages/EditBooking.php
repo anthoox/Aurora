@@ -11,7 +11,14 @@ use Carbon\Carbon;
 class EditBooking extends EditRecord
 {
     protected static string $resource = BookingResource::class;
+    protected function authorizeAccess(): void
+    {
+        parent::authorizeAccess();
 
+        if (!$this->record->canBeEdited()) {
+            abort(403, 'Esta reserva no se puede editar.');
+        }
+    }
     protected function getHeaderActions(): array
     {
         return [
@@ -31,4 +38,6 @@ class EditBooking extends EditRecord
 
         return $data;
     }
+
+    
 }

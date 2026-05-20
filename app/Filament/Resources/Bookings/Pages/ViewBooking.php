@@ -59,7 +59,8 @@ class ViewBooking extends ViewRecord
                         . '&body=' . rawurlencode($body);
                 }),
 
-            EditAction::make(),
+            EditAction::make()
+                ->visible(fn() => $this->record->canBeEdited()),
         ];
     }
 }
