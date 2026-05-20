@@ -132,26 +132,41 @@ class InteractionResource extends Resource
                             ->placeholder('Sin mensaje')
                             ->columnSpanFull(),
                     ])->columns(2),
-                
+
                 Section::make('Cliente recurrente')
                     ->visible(
                         fn($record) =>
                         $record->customer
                             ->interactions()
                             ->where('id', '!=', $record->id)
-                            ->count() > 0
+                            ->exists()
                     )
                     ->schema([
-                        TextEntry::make('customer.id')
+                        TextEntry::make('customer_recurrence_summary')
                             ->label('')
-                            ->formatStateUsing(function ($record) {
-                                $count = $record->customer
+                            ->state(function ($record): string {
+                                $previousInteractions = $record->customer
                                     ->interactions()
-                                    ->where('id', '!=', $record->id)
+                                    ->where('id', '!=', $record->id);
+
+                                $total = (clone $previousInteractions)->count();
+
+                                $withBooking = (clone $previousInteractions)
+                                    ->whereHas('bookings')
                                     ->count();
 
-                                return "⚠ Este cliente tiene {$count} solicitudes previas.";
-                            }),
+                                $sold = (clone $previousInteractions)
+                                    ->where('status', 'vendido')
+                                    ->count();
+
+                                $leadText = $total === 1
+                                    ? '1 lead anterior'
+                                    : "{$total} leads anteriores";
+
+                                return "Cliente recurrente · {$leadText} · {$withBooking} con reserva · {$sold} vendidos";
+                            })
+                            ->badge()
+                            ->color('info'),
                     ])
                     ->compact(),
             ])->columns(2);
