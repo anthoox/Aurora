@@ -98,29 +98,11 @@ class CustomerResource extends Resource
                                     ])
                                     ->columns(2),
 
-                                Section::make('Notas internas')
-                                    ->headerActions([
-                                        Action::make('editNotes')
-                                            ->label('Editar notas')
-                                            ->icon('heroicon-o-pencil-square')
-                                            ->modalHeading('Editar notas internas')
-                                            ->form([
-                                                Textarea::make('internal_notes')
-                                                    ->label('Notas internas')
-                                                    ->rows(8)
-                                                    ->default(fn($record) => $record->internal_notes)
-                                                    ->columnSpanFull(),
-                                            ])
-                                            ->action(function (array $data, $record): void {
-                                                $record->update([
-                                                    'internal_notes' => $data['internal_notes'],
-                                                ]);
-                                            }),
-                                    ])
+                                Section::make('Información adicional')
                                     ->schema([
-                                        TextEntry::make('internal_notes')
-                                            ->label('')
-                                            ->placeholder('Sin notas internas')
+                                        TextEntry::make('metadata')
+                                            ->label('Datos extra')
+                                            ->placeholder('Sin datos adicionales')
                                             ->columnSpanFull(),
                                     ]),
                             ]),
@@ -160,14 +142,32 @@ class CustomerResource extends Resource
                                             ->color('danger'),
                                     ])
                                     ->columns(4),
-
-                                Section::make('Información adicional')
+                                Section::make('Notas internas')
+                                    ->headerActions([
+                                        Action::make('editNotes')
+                                            ->label('Editar notas')
+                                            ->icon('heroicon-o-pencil-square')
+                                            ->modalHeading('Editar notas internas')
+                                            ->form([
+                                                Textarea::make('internal_notes')
+                                                    ->label('Notas internas')
+                                                    ->rows(8)
+                                                    ->default(fn($record) => $record->internal_notes)
+                                                    ->columnSpanFull(),
+                                            ])
+                                            ->action(function (array $data, $record): void {
+                                                $record->update([
+                                                    'internal_notes' => $data['internal_notes'],
+                                                ]);
+                                            }),
+                                    ])
                                     ->schema([
-                                        TextEntry::make('metadata')
-                                            ->label('Datos extra')
-                                            ->placeholder('Sin datos adicionales')
+                                        TextEntry::make('internal_notes')
+                                            ->label('')
+                                            ->placeholder('Sin notas internas')
                                             ->columnSpanFull(),
                                     ]),
+                                
                             ]),
                     ]),
             ]);
