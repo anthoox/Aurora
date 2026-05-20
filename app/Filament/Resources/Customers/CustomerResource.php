@@ -20,6 +20,7 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use App\Filament\Resources\Customers\RelationManagers\BookingsRelationManager;
 use App\Filament\Resources\Customers\RelationManagers\InteractionsRelationManager;
+use App\Filament\Resources\Customers\RelationManagers\BookingHistoryRelationManager;
 class CustomerResource extends Resource
 {
     protected static ?string $model = Customer::class;
@@ -43,6 +44,7 @@ class CustomerResource extends Resource
         return [
             InteractionsRelationManager::class,
             BookingsRelationManager::class,
+            BookingHistoryRelationManager::class,
         ];
     }
 
@@ -121,5 +123,7 @@ class CustomerResource extends Resource
 
             ]);
     }
+
+    
 
 }
