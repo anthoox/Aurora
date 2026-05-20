@@ -134,36 +134,46 @@ class InteractionResource extends Resource
                     ])->columns(2),
 
                 Section::make('Cliente recurrente')
-                    ->visible(
-                        fn($record) =>
-                        $record->customer
+                    ->visible(function ($record): bool {
+                        $previousInteractions = $record->customer
                             ->interactions()
                             ->where('id', '!=', $record->id)
-                            ->exists()
-                    )
+                            ->exists();
+
+                        $previousBookings = $record->customer
+                            ->bookings()
+                            ->exists();
+
+                        return $previousInteractions || $previousBookings;
+                    })
                     ->schema([
                         TextEntry::make('customer_recurrence_summary')
-                            ->label('')
+                            ->label('Resumen de recurrencia')
                             ->state(function ($record): string {
                                 $previousInteractions = $record->customer
                                     ->interactions()
                                     ->where('id', '!=', $record->id);
 
-                                $total = (clone $previousInteractions)->count();
+                                $totalLeads = (clone $previousInteractions)->count();
 
-                                $withBooking = (clone $previousInteractions)
+                                $leadsWithBooking = (clone $previousInteractions)
                                     ->whereHas('bookings')
                                     ->count();
 
-                                $sold = (clone $previousInteractions)
+                                $soldLeads = (clone $previousInteractions)
                                     ->where('status', 'vendido')
                                     ->count();
 
-                                $leadText = $total === 1
-                                    ? '1 lead anterior'
-                                    : "{$total} leads anteriores";
+                                $totalBookings = $record->customer
+                                    ->bookings()
+                                    ->count();
 
-                                return "Cliente recurrente · {$leadText} · {$withBooking} con reserva · {$sold} vendidos";
+                                $completedBookings = $record->customer
+                                    ->bookings()
+                                    ->where('status', 'realizada')
+                                    ->count();
+
+                                return "Cliente recurrente · {$totalLeads} leads anteriores · {$leadsWithBooking} con reserva · {$soldLeads} vendidos · {$totalBookings} reservas · {$completedBookings} realizadas";
                             })
                             ->badge()
                             ->color('info'),
