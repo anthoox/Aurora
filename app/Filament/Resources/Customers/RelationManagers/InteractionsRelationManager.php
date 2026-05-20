@@ -12,7 +12,7 @@ class InteractionsRelationManager extends RelationManager
 {
     protected static string $relationship = 'interactions';
 
-    protected static ?string $title = 'Historial comercial';
+    protected static ?string $title = 'Historial de leads';
 
     protected static ?string $relatedResource = InteractionResource::class;
 

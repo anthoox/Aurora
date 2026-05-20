@@ -2,65 +2,21 @@
 
 namespace App\Filament\Resources\Customers\RelationManagers;
 
+use App\Filament\Resources\Bookings\BookingResource;
+use App\Filament\Resources\Customers\Pages\ViewCustomer;
 use Filament\Actions\CreateAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
+use Filament\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use App\Filament\Resources\Customers\Pages\ViewCustomer;
 
 class BookingsRelationManager extends RelationManager
 {
   protected static string $relationship = 'bookings';
 
-  protected static ?string $title = 'Reservas futuras';
-
-  public function form(Schema $schema): Schema
-  {
-    return $schema
-      ->components([
-        DateTimePicker::make('starts_at')
-          ->label('Fecha y hora de inicio')
-          ->required(),
-
-        DateTimePicker::make('ends_at')
-          ->label('Fecha y hora de fin'),
-
-        Select::make('service_id')
-          ->label('Servicio')
-          ->relationship('service', 'name')
-          ->searchable()
-          ->preload(),
-
-        Select::make('source_id')
-          ->label('Origen')
-          ->relationship('source', 'name')
-          ->searchable()
-          ->preload(),
-
-        Select::make('status')
-          ->label('Estado')
-          ->options([
-            'pendiente' => 'Pendiente',
-            'confirmada' => 'Confirmada',
-            'cancelada' => 'Cancelada',
-            'realizada' => 'Realizada',
-          ])
-          ->default('pendiente')
-          ->required(),
-
-        Textarea::make('notes')
-          ->label('Notas')
-          ->columnSpanFull(),
-      ]);
-  }
+  protected static ?string $title = 'Próximas reservas';
 
   public function table(Table $table): Table
   {
@@ -68,18 +24,34 @@ class BookingsRelationManager extends RelationManager
       ->modifyQueryUsing(
         fn(Builder $query) => $query
           ->where('starts_at', '>=', now())
+          ->whereIn('status', ['pendiente', 'confirmada'])
           ->orderBy('starts_at')
       )
       ->columns([
+        TextColumn::make('id')
+          ->label('Reserva')
+          ->formatStateUsing(fn($state) => 'RES-' . $state),
+
         TextColumn::make('starts_at')
-          ->label('Inicio')
+          ->label('Fecha')
           ->dateTime('d/m/Y H:i')
           ->sortable(),
 
-        TextColumn::make('ends_at')
-          ->label('Fin')
-          ->dateTime('d/m/Y H:i')
-          ->placeholder('Sin fecha fin'),
+        TextColumn::make('duration')
+          ->label('Duración')
+          ->state(function ($record): string {
+            if (!$record->starts_at || !$record->ends_at) {
+              return 'Sin duración';
+            }
+
+            $hours = $record->starts_at->diffInHours($record->ends_at);
+
+            return $hours === 1
+              ? '1 hora'
+              : "{$hours} horas";
+          })
+          ->badge()
+          ->color('gray'),
 
         TextColumn::make('service.name')
           ->label('Servicio')
@@ -96,8 +68,6 @@ class BookingsRelationManager extends RelationManager
           ->color(fn(string $state): string => match ($state) {
             'pendiente' => 'warning',
             'confirmada' => 'success',
-            'cancelada' => 'danger',
-            'realizada' => 'info',
             default => 'gray',
           }),
       ])
@@ -105,9 +75,20 @@ class BookingsRelationManager extends RelationManager
         CreateAction::make()
           ->label('Nueva reserva'),
       ])
-      ->actions([
-        EditAction::make(),
-        DeleteAction::make(),
+      ->recordActions([
+        ViewAction::make()
+          ->url(fn($record) => BookingResource::getUrl('view', [
+            'record' => $record,
+          ])),
+
+        EditAction::make()
+          ->disabled(fn($record) => !$record->canBeEdited())
+          ->tooltip(
+            fn($record) => $record->canBeEdited()
+            ? 'Editar reserva'
+            : 'Esta reserva no se puede editar por su estado o porque ya ha empezado'
+          )
+          ->color(fn($record) => $record->canBeEdited() ? 'primary' : 'gray'),
       ]);
   }
 
