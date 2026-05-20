@@ -79,11 +79,11 @@ Notas:
         ");
   }
 
-  public function deleteEvent(string $googleEventId): void
+  public function deleteEvent(string $eventId): void
   {
     $this->calendar->events->delete(
       $this->calendarId,
-      $googleEventId
+      $eventId
     );
   }
 
@@ -111,6 +111,8 @@ Notas:
       $booking->google_event_id,
       $event
     );
+
+    
   }
 
   
