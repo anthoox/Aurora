@@ -3,31 +3,68 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Source;
-use Filament\Widgets\Widget;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+use Filament\Widgets\TableWidget;
+use Illuminate\Database\Eloquent\Builder;
 
-class SourceConversionStats extends Widget
+class SourceConversionStats extends TableWidget
 {
-    protected string $view = 'filament.widgets.source-conversion-stats';
-
-    protected int|string|array $columnSpan = 'full';
     protected static bool $isDiscovered = false;
 
-    public function getSources()
-    {
-        return Source::query()
-            ->withCount([
-                'interactions',
-                'interactions as vendidos_count' => fn($query) =>
-                    $query->where('status', 'vendido'),
-            ])
-            ->get()
-            ->map(function ($source) {
-                $source->conversion_rate =
-                    $source->interactions_count > 0
-                    ? round(($source->vendidos_count / $source->interactions_count) * 100, 1)
-                    : 0;
+    protected static ?string $heading = 'Conversión por web';
 
-                return $source;
-            });
+    protected int|string|array $columnSpan = 'full';
+
+    public function table(Table $table): Table
+    {
+        return $table
+            ->query(
+                Source::query()
+                    ->withCount([
+                        'interactions',
+                        'interactions as vendidos_count' => fn(Builder $query) =>
+                            $query->where('status', 'vendido'),
+                    ])
+            )
+            ->columns([
+                TextColumn::make('name')
+                    ->label('Web')
+                    ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('interactions_count')
+                    ->label('Leads')
+                    ->sortable(),
+
+                TextColumn::make('vendidos_count')
+                    ->label('Vendidos')
+                    ->sortable(),
+
+                TextColumn::make('conversion_rate')
+                    ->label('Conversión')
+                    ->state(function ($record): string {
+                        if ($record->interactions_count === 0) {
+                            return '0%';
+                        }
+
+                        return round(($record->vendidos_count / $record->interactions_count) * 100, 1) . '%';
+                    })
+                    ->badge()
+                    ->color(function ($record): string {
+                        if ($record->interactions_count === 0) {
+                            return 'gray';
+                        }
+
+                        $rate = ($record->vendidos_count / $record->interactions_count) * 100;
+
+                        return match (true) {
+                            $rate >= 70 => 'success',
+                            $rate >= 30 => 'warning',
+                            default => 'danger',
+                        };
+                    }),
+            ])
+            ->defaultSort('vendidos_count', 'desc');
     }
 }

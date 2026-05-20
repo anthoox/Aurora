@@ -1,19 +1,19 @@
 <x-filament-widgets::widget>
     <x-filament::section heading="Servicios más vendidos">
-        <div class="space-y-4">
+        <div class="space-y-3">
             @foreach ($this->getServices() as $service)
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between rounded-xl border border-gray-700/50 bg-gray-900/40 p-4">
                     <div>
-                        <div class="font-medium">
+                        <p class="font-semibold">
                             {{ $service->name }}
-                        </div>
+                        </p>
 
-                        <div class="text-sm text-gray-500">
+                        <p class="text-sm text-gray-400">
                             Reservas realizadas
-                        </div>
+                        </p>
                     </div>
 
-                    <div class="text-lg font-bold">
+                    <div class="text-2xl font-bold">
                         {{ $service->completed_bookings_count }}
                     </div>
                 </div>
