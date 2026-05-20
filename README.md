@@ -392,7 +392,7 @@ Preparar Aurora para equipos.
 
 - [ ] Que adminitrador total añada campos nuevos en cada recurso
 - [ ] Enviar email tras confirmar reserva y que invite a añadirlo a su calendar
-- [ ] Timeline para todos
+- [ ] Timeline para todos (reservas, interacciones sobre todo)
 - [ ] Emails automáticos
 - [ ] Españolizar
 - [ ] Mejorar diseño y colores de todas las vistas

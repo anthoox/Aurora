@@ -2,13 +2,10 @@
 
 namespace App\Filament\Resources\Customers\Tables;
 
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Filament\Actions\ViewAction;
-
 
 class CustomersTable
 {
@@ -16,36 +13,48 @@ class CustomersTable
     {
         return $table
             ->columns([
+                TextColumn::make('full_name')
+                    ->label('Cliente')
+                    ->state(fn($record): string => trim(
+                        "{$record->first_name} {$record->last_name}"
+                    ))
+                    ->searchable(['first_name', 'last_name'])
+                    ->sortable(['first_name']),
+
                 TextColumn::make('email')
-                    ->label('Email address')
-                    ->searchable(),
-                TextColumn::make('first_name')
-                    ->searchable(),
-                TextColumn::make('last_name')
-                    ->searchable(),
+                    ->label('Email')
+                    ->searchable()
+                    ->copyable(),
+
                 TextColumn::make('phone')
-                    ->searchable(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->label('Teléfono')
+                    ->searchable()
+                    ->placeholder('Sin teléfono')
+                    ->copyable(),
+
+                TextColumn::make('interactions_count')
+                    ->label('Leads')
+                    ->counts('interactions')
+                    ->badge()
+                    ->color(fn($state): string => $state > 0 ? 'info' : 'gray'),
+
+                TextColumn::make('bookings_count')
+                    ->label('Reservas')
+                    ->counts('bookings')
+                    ->badge()
+                    ->color(fn($state): string => $state > 0 ? 'success' : 'gray'),
+
                 TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->label('Última actividad')
+                    ->since()
+                    ->sortable(),
             ])
             ->filters([
                 //
             ])
-
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
             ]);
     }
 }
