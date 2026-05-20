@@ -3,12 +3,11 @@
 namespace App\Filament\Resources\Bookings\Schemas;
 
 use App\Models\Service;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Carbon\Carbon;
-use Filament\Forms\Components\DatePicker;
 
 class BookingForm
 {
@@ -62,7 +61,8 @@ class BookingForm
                             })
                             ->searchable()
                             ->preload()
-                            ->placeholder('Selecciona primero un origen'),
+                            ->placeholder('Selecciona primero un origen')
+                            ->required(),
                     ])
                     ->columns(2),
 
@@ -75,9 +75,12 @@ class BookingForm
                             ->required()
                             ->afterStateHydrated(function ($component, $record) {
                                 if ($record?->starts_at) {
-                                    $component->state($record->starts_at->toDateString());
+                                    $component->state(
+                                        $record->starts_at->toDateString()
+                                    );
                                 }
                             }),
+
                         Select::make('start_time')
                             ->label('Hora inicio')
                             ->options([
@@ -109,7 +112,9 @@ class BookingForm
                             ->required()
                             ->afterStateHydrated(function ($component, $record) {
                                 if ($record?->starts_at) {
-                                    $component->state($record->starts_at->format('H:i'));
+                                    $component->state(
+                                        $record->starts_at->format('H:i')
+                                    );
                                 }
                             }),
 
@@ -126,7 +131,9 @@ class BookingForm
                             ->required()
                             ->afterStateHydrated(function ($component, $record) {
                                 if ($record?->starts_at && $record?->ends_at) {
-                                    $component->state($record->starts_at->diffInHours($record->ends_at));
+                                    $component->state(
+                                        $record->starts_at->diffInHours($record->ends_at)
+                                    );
                                 }
                             }),
 
