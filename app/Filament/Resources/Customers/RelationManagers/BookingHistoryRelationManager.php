@@ -33,7 +33,19 @@ class BookingHistoryRelationManager extends RelationManager
                 TextColumn::make('id')
                     ->label('Reserva')
                     ->formatStateUsing(fn($state) => 'RES-' . $state),
-
+                TextColumn::make('booking_origin')
+                    ->label('Origen reserva')
+                    ->state(
+                        fn($record): string => $record->interaction_id
+                        ? 'Lead INT-' . $record->interaction_id
+                        : 'Manual'
+                    )
+                    ->badge()
+                    ->color(
+                        fn(string $state): string => str_starts_with($state, 'Lead')
+                        ? 'info'
+                        : 'gray'
+                    ),
                 TextColumn::make('starts_at')
                     ->label('Fecha')
                     ->dateTime('d/m/Y H:i')

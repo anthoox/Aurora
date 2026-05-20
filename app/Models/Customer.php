@@ -7,7 +7,14 @@ use App\Models\Interaction;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 class Customer extends Model
 {
-    protected $fillable = ['email', 'first_name', 'last_name', 'phone', 'metadata'];
+    protected $fillable = [
+        'email',
+        'first_name',
+        'last_name',
+        'phone',
+        'metadata',
+        'internal_notes',
+    ];
     public function interactions()
     {
         return $this->hasMany(Interaction::class);
