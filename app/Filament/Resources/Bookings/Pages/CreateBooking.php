@@ -14,6 +14,12 @@ class CreateBooking extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $startsAt = Carbon::parse($data['booking_date'] . ' ' . $data['start_time']);
+        
+        if ($startsAt->isPast()) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'start_time' => 'La hora de inicio no puede ser anterior a la hora actual.',
+            ]);
+        }
 
         $data['starts_at'] = $startsAt;
         $data['ends_at'] = $startsAt->copy()->addHours((int) $data['duration_hours']);

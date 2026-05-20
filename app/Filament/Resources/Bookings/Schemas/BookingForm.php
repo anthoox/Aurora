@@ -71,7 +71,7 @@ class BookingForm
                         DatePicker::make('booking_date')
                             ->label('Fecha')
                             ->native(false)
-                            ->minDate(now())
+                            ->minDate(today())
                             ->required()
                             ->afterStateHydrated(function ($component, $record) {
                                 if ($record?->starts_at) {
@@ -110,6 +110,21 @@ class BookingForm
                             ])
                             ->searchable()
                             ->required()
+                            ->rule(function ($get) {
+                                return function (string $attribute, $value, \Closure $fail) use ($get) {
+                                    $date = $get('booking_date');
+
+                                    if (!$date || !$value) {
+                                        return;
+                                    }
+
+                                    $startsAt = \Carbon\Carbon::parse($date . ' ' . $value);
+
+                                    if ($startsAt->isPast()) {
+                                        $fail('La hora de inicio no puede ser anterior a la hora actual.');
+                                    }
+                                };
+                            })
                             ->afterStateHydrated(function ($component, $record) {
                                 if ($record?->starts_at) {
                                     $component->state(
