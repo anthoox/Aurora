@@ -87,6 +87,45 @@ class CustomerResource extends Resource
                             ->dateTime('d/m/Y H:i'),
                     ])
                     ->columns(2),
+                Section::make('Información adicional')
+                    ->schema([
+                        TextEntry::make('metadata')
+                            ->label('Datos extra')
+                            ->placeholder('Sin datos adicionales')
+                            ->columnSpanFull(),
+                    ]),
+
+                Section::make('Resumen comercial')
+                    ->schema([
+                        TextEntry::make('total_leads')
+                            ->label('Leads')
+                            ->state(fn($record) => $record->interactions()->count())
+                            ->badge()
+                            ->color('info'),
+
+                        TextEntry::make('total_bookings')
+                            ->label('Reservas')
+                            ->state(fn($record) => $record->bookings()->count())
+                            ->badge()
+                            ->color('primary'),
+
+                        TextEntry::make('completed_bookings')
+                            ->label('Realizadas')
+                            ->state(fn($record) => $record->bookings()
+                                ->where('status', 'realizada')
+                                ->count())
+                            ->badge()
+                            ->color('success'),
+
+                        TextEntry::make('cancelled_bookings')
+                            ->label('Canceladas')
+                            ->state(fn($record) => $record->bookings()
+                                ->where('status', 'cancelada')
+                                ->count())
+                            ->badge()
+                            ->color('danger'),
+                    ])
+                    ->columns(4),
                 Section::make('Notas internas')
                     ->headerActions([
                         Action::make('editNotes')
@@ -110,13 +149,6 @@ class CustomerResource extends Resource
                         TextEntry::make('internal_notes')
                             ->label('')
                             ->placeholder('Sin notas internas')
-                            ->columnSpanFull(),
-                    ]),
-                Section::make('Información adicional')
-                    ->schema([
-                        TextEntry::make('metadata')
-                            ->label('Datos extra')
-                            ->placeholder('Sin datos adicionales')
                             ->columnSpanFull(),
                     ]),
 
