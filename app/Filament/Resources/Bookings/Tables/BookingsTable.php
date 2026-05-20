@@ -37,15 +37,25 @@ class BookingsTable
                     ->sortable(),
 
                 TextColumn::make('starts_at')
-                    ->label('Inicio')
+                    ->label('Fecha Reserva')
                     ->dateTime('d/m/Y H:i')
                     ->sortable(),
 
-                TextColumn::make('ends_at')
-                    ->label('Fin')
-                    ->dateTime('d/m/Y H:i')
-                    ->placeholder('Sin fecha fin')
-                    ->sortable(),
+                TextColumn::make('duration')
+                    ->label('Duración')
+                    ->state(function ($record): string {
+                        if (!$record->starts_at || !$record->ends_at) {
+                            return 'Sin duración';
+                        }
+
+                        $hours = $record->starts_at->diffInHours($record->ends_at);
+
+                        return $hours === 1
+                            ? '1 hora'
+                            : "{$hours} horas";
+                    })
+                    ->badge()
+                    ->color('gray'),
 
                 TextColumn::make('status')
                     ->label('Estado')
@@ -62,8 +72,7 @@ class BookingsTable
                 TextColumn::make('created_at')
                     ->label('Creada')
                     ->dateTime('d/m/Y H:i')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
 
                 TextColumn::make('updated_at')
                     ->label('Actualizada')
