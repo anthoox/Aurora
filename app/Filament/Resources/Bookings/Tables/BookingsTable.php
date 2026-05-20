@@ -72,7 +72,9 @@ class BookingsTable
                 TextColumn::make('created_at')
                     ->label('Creada')
                     ->dateTime('d/m/Y H:i')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
 
                 TextColumn::make('updated_at')
                     ->label('Actualizada')
@@ -86,11 +88,6 @@ class BookingsTable
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
             ]);
     }
 }
