@@ -246,7 +246,6 @@ SE ha conseguido que funcione hasta registrar el evento para el dueño del email
 Las reservas solo se envian si se crean confirmadas. No si
 ### Funcionalidades
 - [x] Crear evento en Google Calendar
-- [ ] Enviar invitación al cliente
 - [x] Sincronización automática
 - [x] Actualización de eventos
 
@@ -330,7 +329,7 @@ Convertir Aurora en una herramienta de análisis comercial.
 ### Métricas
 - [x] Leads mensuales
 - [x] Conversión por web
-- [ ] Conversión por servicio
+- [x] Conversión por servicio
 - [x] Leads pendientes
 - [x] Servicios más vendidos
 
@@ -340,18 +339,21 @@ Convertir Aurora en una herramienta de análisis comercial.
 - Consultas complejas
 
 ---
+# 🔮 Ideas futuras
+- añadir servicios reales con precios reales
+- añadir configuración de servicios reales
 
-## 13. Gestión comercial y ventas
+## 13. Gestión comercial y ventas - PENDIENTE
 
 ### Objetivo
-Controlar presupuestos y ventas.
+Controlar presupuestos y ventas. pero eso se tiene que hacer siempre que se vaya creando la reserva. al añadi el servicio se le añade el precio pero falta poner la cantidad de participanetes. Añadir ofertas y esas cosas perio creo q eso lo decidire una vez vea el catalogo real de mi cliente. por ahora todo es una configuración basica. pero hay que añadir sus servicios, clases, sus webs, sus oferas
 
 ### Funcionalidades
 - [ ] Precio estimado
 - [ ] Precio final
 - [ ] Forma de pago
 - [ ] Estado comercial
-- [ ] Observaciones de venta
+
 
 ### Aprendizajes
 - Flujo comercial
@@ -389,16 +391,14 @@ Preparar Aurora para equipos.
 # 🔮 Ideas futuras
 
 - [ ] Que adminitrador total añada campos nuevos en cada recurso
-- [ ] Enviar email tras confirmar reserva.
+- [ ] Enviar email tras confirmar reserva y que invite a añadirlo a su calendar
 - [ ] Timeline para todos
 - [ ] Emails automáticos
 - [ ] Españolizar
-- [ ] Mejorar diseño y colores
-- [ ] Alertas internas
-- [ ] Pipeline comercial tipo Kanban
-- [ ] Integración con Telegram
-- [ ] Integración con Stripe
+- [ ] Mejorar diseño y colores de todas las vistas
 - [ ] Exportación PDF/Excel
+- [ ] Alertas internas
+- [ ] Formularios wordpress
 - [ ] Facturación
 - [ ] Webhooks externos
 - [ ] API pública
