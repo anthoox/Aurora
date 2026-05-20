@@ -127,7 +127,14 @@ class BookingObserver
         if (
             $booking->google_event_id &&
             $booking->status === 'confirmada' &&
-            $booking->wasChanged('notes')
+            $booking->wasChanged([
+                'starts_at',
+                'ends_at',
+                'notes',
+                'service_id',
+                'customer_id',
+                'source_id',
+            ])
         ) {
             try {
                 app(GoogleCalendarService::class)
@@ -137,7 +144,7 @@ class BookingObserver
                     'google_synced_at' => now(),
                 ]);
             } catch (\Throwable $e) {
-                Log::error('Error al actualizar notas en Google Calendar', [
+                Log::error('Error al actualizar evento en Google Calendar', [
                     'booking_id' => $booking->id,
                     'message' => $e->getMessage(),
                 ]);
