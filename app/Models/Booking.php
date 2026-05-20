@@ -51,7 +51,7 @@ class Booking extends Model
             return false;
         }
 
-        if ($this->status === 'confirmada' && $this->ends_at && $this->ends_at->isPast()) {
+        if ($this->status === 'confirmada' && $this->starts_at && $this->starts_at->isPast()) {
             return false;
         }
 
