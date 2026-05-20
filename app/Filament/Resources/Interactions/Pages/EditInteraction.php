@@ -15,9 +15,16 @@ class EditInteraction extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            DeleteAction::make(),
             ViewAction::make(),
 
         ];
+    }
+    protected function authorizeAccess(): void
+    {
+        parent::authorizeAccess();
+
+        if (!$this->record->canBeEdited()) {
+            abort(403, 'Esta interacción no se puede editar.');
+        }
     }
 }

@@ -197,7 +197,14 @@ class InteractionsTable
                     ->label('Ver'),
 
                 EditAction::make()
-                    ->label('Editar'),
+                    ->label('Editar')
+                    ->disabled(fn($record) => !$record->canBeEdited())
+                    ->tooltip(
+                        fn($record) => $record->canBeEdited()
+                        ? 'Editar interacción'
+                        : 'Esta interacción ya está cerrada'
+                    )
+                    ->color(fn($record) => $record->canBeEdited() ? 'primary' : 'gray'),
             ]);
     }
 }

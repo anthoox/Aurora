@@ -174,7 +174,14 @@ class ViewInteraction extends ViewRecord
 
         }),
 
-      EditAction::make(),
+      EditAction::make()
+        ->disabled(fn() => !$this->record->canBeEdited())
+        ->tooltip(
+          fn() => $this->record->canBeEdited()
+          ? 'Editar interacción'
+          : 'Esta interacción ya está cerrada'
+        )
+        ->color(fn() => $this->record->canBeEdited() ? 'primary' : 'gray'),
     ];
   }
 

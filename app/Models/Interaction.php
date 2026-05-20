@@ -69,5 +69,13 @@ class Interaction extends Model
 
         return $service?->pivot?->description;
     }
+
+    public function canBeEdited(): bool
+    {
+        return !in_array($this->status, [
+            'vendido',
+            'descartado',
+        ]);
+    }
     
 }
