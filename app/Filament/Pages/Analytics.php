@@ -11,7 +11,7 @@ class Analytics extends Page
 
     protected static ?string $navigationLabel = 'Analytics';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'CRM';
+    protected static string|\UnitEnum|null $navigationGroup = 'Business';
 
     protected static ?int $navigationSort = 99;
 
