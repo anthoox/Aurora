@@ -21,6 +21,7 @@ use Filament\Schemas\Components\Section;
 use App\Filament\Resources\Customers\RelationManagers\BookingsRelationManager;
 use App\Filament\Resources\Customers\RelationManagers\InteractionsRelationManager;
 use App\Filament\Resources\Customers\RelationManagers\BookingHistoryRelationManager;
+use Filament\Schemas\Components\Grid;
 class CustomerResource extends Resource
 {
     protected static ?string $model = Customer::class;
@@ -66,93 +67,109 @@ class CustomerResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('Datos personales')
+                Grid::make([
+                    'lg' => 2,
+                ])->columnSpanFull()
                     ->schema([
-                        TextEntry::make('first_name')
-                            ->label('Nombre'),
 
-                        TextEntry::make('last_name')
-                            ->label('Apellidos')
-                            ->placeholder('Sin apellidos'),
+                        // COLUMNA IZQUIERDA
+                        Grid::make(1)
+                            ->schema([
 
-                        TextEntry::make('email')
-                            ->label('Email'),
+                                Section::make('Datos personales')
+                                    ->schema([
+                                        TextEntry::make('first_name')
+                                            ->label('Nombre'),
 
-                        TextEntry::make('phone')
-                            ->label('Teléfono')
-                            ->placeholder('Sin teléfono'),
+                                        TextEntry::make('last_name')
+                                            ->label('Apellidos')
+                                            ->placeholder('Sin apellidos'),
 
-                        TextEntry::make('created_at')
-                            ->label('Cliente desde')
-                            ->dateTime('d/m/Y H:i'),
-                    ])
-                    ->columns(2),
-                Section::make('Información adicional')
-                    ->schema([
-                        TextEntry::make('metadata')
-                            ->label('Datos extra')
-                            ->placeholder('Sin datos adicionales')
-                            ->columnSpanFull(),
+                                        TextEntry::make('email')
+                                            ->label('Email'),
+
+                                        TextEntry::make('phone')
+                                            ->label('Teléfono')
+                                            ->placeholder('Sin teléfono'),
+
+                                        TextEntry::make('created_at')
+                                            ->label('Cliente desde')
+                                            ->dateTime('d/m/Y H:i'),
+                                    ])
+                                    ->columns(2),
+
+                                Section::make('Notas internas')
+                                    ->headerActions([
+                                        Action::make('editNotes')
+                                            ->label('Editar notas')
+                                            ->icon('heroicon-o-pencil-square')
+                                            ->modalHeading('Editar notas internas')
+                                            ->form([
+                                                Textarea::make('internal_notes')
+                                                    ->label('Notas internas')
+                                                    ->rows(8)
+                                                    ->default(fn($record) => $record->internal_notes)
+                                                    ->columnSpanFull(),
+                                            ])
+                                            ->action(function (array $data, $record): void {
+                                                $record->update([
+                                                    'internal_notes' => $data['internal_notes'],
+                                                ]);
+                                            }),
+                                    ])
+                                    ->schema([
+                                        TextEntry::make('internal_notes')
+                                            ->label('')
+                                            ->placeholder('Sin notas internas')
+                                            ->columnSpanFull(),
+                                    ]),
+                            ]),
+
+                        // COLUMNA DERECHA
+                        Grid::make(1)
+                            ->schema([
+
+                                Section::make('Resumen comercial')
+                                    ->schema([
+                                        TextEntry::make('total_leads')
+                                            ->label('Leads')
+                                            ->state(fn($record) => $record->interactions()->count())
+                                            ->badge()
+                                            ->color('info'),
+
+                                        TextEntry::make('total_bookings')
+                                            ->label('Reservas')
+                                            ->state(fn($record) => $record->bookings()->count())
+                                            ->badge()
+                                            ->color('primary'),
+
+                                        TextEntry::make('completed_bookings')
+                                            ->label('Realizadas')
+                                            ->state(fn($record) => $record->bookings()
+                                                ->where('status', 'realizada')
+                                                ->count())
+                                            ->badge()
+                                            ->color('success'),
+
+                                        TextEntry::make('cancelled_bookings')
+                                            ->label('Canceladas')
+                                            ->state(fn($record) => $record->bookings()
+                                                ->where('status', 'cancelada')
+                                                ->count())
+                                            ->badge()
+                                            ->color('danger'),
+                                    ])
+                                    ->columns(4),
+
+                                Section::make('Información adicional')
+                                    ->schema([
+                                        TextEntry::make('metadata')
+                                            ->label('Datos extra')
+                                            ->placeholder('Sin datos adicionales')
+                                            ->columnSpanFull(),
+                                    ]),
+                            ]),
                     ]),
-
-                Section::make('Resumen comercial')
-                    ->schema([
-                        TextEntry::make('total_leads')
-                            ->label('Leads')
-                            ->state(fn($record) => $record->interactions()->count())
-                            ->badge()
-                            ->color('info'),
-
-                        TextEntry::make('total_bookings')
-                            ->label('Reservas')
-                            ->state(fn($record) => $record->bookings()->count())
-                            ->badge()
-                            ->color('primary'),
-
-                        TextEntry::make('completed_bookings')
-                            ->label('Realizadas')
-                            ->state(fn($record) => $record->bookings()
-                                ->where('status', 'realizada')
-                                ->count())
-                            ->badge()
-                            ->color('success'),
-
-                        TextEntry::make('cancelled_bookings')
-                            ->label('Canceladas')
-                            ->state(fn($record) => $record->bookings()
-                                ->where('status', 'cancelada')
-                                ->count())
-                            ->badge()
-                            ->color('danger'),
-                    ])
-                    ->columns(4),
-                Section::make('Notas internas')
-                    ->headerActions([
-                        Action::make('editNotes')
-                            ->label('Editar notas')
-                            ->icon('heroicon-o-pencil-square')
-                            ->modalHeading('Editar notas internas')
-                            ->form([
-                                Textarea::make('internal_notes')
-                                    ->label('Notas internas')
-                                    ->rows(8)
-                                    ->default(fn($record) => $record->internal_notes)
-                                    ->columnSpanFull(),
-                            ])
-                            ->action(function (array $data, $record): void {
-                                $record->update([
-                                    'internal_notes' => $data['internal_notes'],
-                                ]);
-                            }),
-                    ])
-                    ->schema([
-                        TextEntry::make('internal_notes')
-                            ->label('')
-                            ->placeholder('Sin notas internas')
-                            ->columnSpanFull(),
-                    ]),
-
-
             ]);
     }
 
