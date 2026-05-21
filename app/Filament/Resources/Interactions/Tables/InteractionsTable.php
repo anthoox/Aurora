@@ -45,21 +45,21 @@ class InteractionsTable
                     ->badge()
                     ->sortable(),
 
-                TextColumn::make('origin_type')
-                    ->label('Entrada')
-                    ->badge()
-                    ->formatStateUsing(fn(?string $state): string => match ($state) {
-                        'api' => 'Web/API',
-                        'manual' => 'Manual',
-                        'booking' => 'Reserva',
-                        default => 'Manual',
-                    })
-                    ->color(fn(?string $state): string => match ($state) {
-                        'api' => 'success',
-                        'manual' => 'gray',
-                        'booking' => 'info',
-                        default => 'gray',
-                    }),
+                // TextColumn::make('origin_type')
+                //     ->label('Entrada')
+                //     ->badge()
+                //     ->formatStateUsing(fn(?string $state): string => match ($state) {
+                //         'api' => 'Web/API',
+                //         'manual' => 'Manual',
+                //         'booking' => 'Reserva',
+                //         default => 'Manual',
+                //     })
+                //     ->color(fn(?string $state): string => match ($state) {
+                //         'api' => 'success',
+                //         'manual' => 'gray',
+                //         'booking' => 'info',
+                //         default => 'gray',
+                //     }),
 
                 TextColumn::make('follow_up_status')
                     ->label('Seguimiento')

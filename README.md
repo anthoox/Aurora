@@ -400,6 +400,7 @@ Preparar Aurora para equipos.
 - [ ] Alertas internas
 - [ ] Formularios wordpress
 - [ ] Facturación
+- [ ] Configuración de servidor para que realice comando de actualización de reservas
 - [ ] Webhooks externos
 - [ ] API pública
 - [ ] Sistema multiempresa
