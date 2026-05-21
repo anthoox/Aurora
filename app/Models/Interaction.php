@@ -72,10 +72,7 @@ class Interaction extends Model
 
     public function canBeEdited(): bool
     {
-        return !in_array($this->status, [
-            'vendido',
-            'descartado',
-        ]);
+        return $this->status !== 'vendido';
     }
     
 }
