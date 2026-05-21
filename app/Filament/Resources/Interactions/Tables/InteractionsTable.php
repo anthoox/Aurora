@@ -127,13 +127,13 @@ class InteractionsTable
                     ->label('Servicio')
                     ->relationship('service', 'name'),
 
-                SelectFilter::make('origin_type')
-                    ->label('Entrada')
-                    ->options([
-                        'api' => 'Web/API',
-                        'manual' => 'Manual',
-                        'booking' => 'Reserva',
-                    ]),
+                // SelectFilter::make('origin_type')
+                //     ->label('Entrada')
+                //     ->options([
+                //         'api' => 'Web/API',
+                //         'manual' => 'Manual',
+                //         'booking' => 'Reserva',
+                //     ]),
 
                 Filter::make('created_at')
                     ->label('Fecha')
