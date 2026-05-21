@@ -15,7 +15,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-
+use App\Filament\Resources\Bookings\RelationManagers\EventsRelationManager;
 class BookingResource extends Resource
 {
     protected static ?string $model = Booking::class;
@@ -44,7 +44,7 @@ class BookingResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            EventsRelationManager::class,
         ];
     }
 

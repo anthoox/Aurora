@@ -45,6 +45,18 @@ class BookingObserver
                 ]);
             }
         }
+
+        $booking->events()->create([
+            'user_id' => auth()->id(),
+            'type' => 'booking_created',
+            'description' => 'Reserva creada',
+            'new_value' => $booking->starts_at?->format('d/m/Y H:i'),
+            'metadata' => [
+                'status' => $booking->status,
+                'starts_at' => $booking->starts_at,
+                'ends_at' => $booking->ends_at,
+            ],
+        ]);
     }
 
     /**
@@ -82,6 +94,7 @@ class BookingObserver
                     ],
                 ]);
             }
+            
 
             if ($booking->status === 'confirmada' && !$booking->google_event_id) {
                 try {
@@ -150,6 +163,17 @@ class BookingObserver
                 ]);
             }
         }
+
+        if ($booking->wasChanged('status')) {
+            $booking->events()->create([
+                'user_id' => auth()->id(),
+                'type' => 'status_changed',
+                'description' => "Estado cambiado de {$booking->getOriginal('status')} a {$booking->status}",
+                'old_value' => $booking->getOriginal('status'),
+                'new_value' => $booking->status,
+            ]);
+        }
+        
     }
     /**
      * Handle the Booking "deleted" event.

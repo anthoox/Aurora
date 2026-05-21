@@ -57,5 +57,10 @@ class Booking extends Model
 
         return true;
     }
+
+    public function events()
+    {
+        return $this->hasMany(BookingEvent::class);
+    }
     
 }
