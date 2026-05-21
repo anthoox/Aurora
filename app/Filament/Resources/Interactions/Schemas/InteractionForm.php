@@ -22,7 +22,23 @@ class InteractionForm
                                 'contactado' => 'Contactado',
                                 'descartado' => 'Descartado',
                             ])
-                            ->required(),
+                            ->required()
+                            ->rules([
+                                function ($get, $record) {
+                                    return function (string $attribute, $value, \Closure $fail) use ($record) {
+
+                                        if (
+                                            $value === 'descartado'
+                                            && $record
+                                            && $record->bookings()
+                                                ->whereIn('status', ['pendiente', 'confirmada'])
+                                                ->exists()
+                                        ) {
+                                            $fail('No puedes descartar este lead porque tiene una reserva activa.');
+                                        }
+                                    };
+                                },
+                            ]),
 
                         Textarea::make('notes')
                             ->label('Notas internas')
