@@ -35,7 +35,10 @@ class BookingsTable
                     ->label('Servicio')
                     ->placeholder('Sin servicio')
                     ->sortable(),
-
+                TextColumn::make('service.created_at')
+                    ->label('Fecha creación')
+                    ->placeholder('Sin servicio')
+                    ->sortable(),
                 TextColumn::make('starts_at')
                     ->label('Fecha Reserva')
                     ->dateTime('d/m/Y H:i')

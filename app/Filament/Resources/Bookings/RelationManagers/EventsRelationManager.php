@@ -29,7 +29,9 @@ class EventsRelationManager extends RelationManager
                         'status_changed' => 'Cambio de estado',
                         'date_changed' => 'Cambio de fecha',
                         'notes_changed' => 'Notas actualizadas',
-                        'calendar_synced' => 'Calendar sincronizado',
+                        'participants_changed' => 'Participantes',
+                        'language_changed' => 'Idioma',
+                        'level_changed' => 'Nivel',
                         default => $state,
                     }),
 

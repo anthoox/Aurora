@@ -353,7 +353,7 @@ Controlar presupuestos y ventas. pero eso se tiene que hacer siempre que se vaya
 - [ ] Precio final
 - [ ] Forma de pago
 - [ ] Estado comercial
-
+- [ ] Mensajeria por emails de contacto
 
 ### Aprendizajes
 - Flujo comercial

@@ -141,6 +141,38 @@ class BookingObserver
             ]);
         }
 
+        if ($booking->wasChanged('language')) {
+            $booking->events()->create([
+                'user_id' => auth()->id(),
+                'type' => 'language_changed',
+                'description' => 'Idioma actualizado',
+                'old_value' => $booking->getOriginal('language'),
+                'new_value' => $booking->language,
+            ]);
+        }
+
+
+
+        if ($booking->wasChanged('level')) {
+            $booking->events()->create([
+                'user_id' => auth()->id(),
+                'type' => 'level_changed',
+                'description' => 'Nivel actualizado',
+                'old_value' => $booking->getOriginal('level'),
+                'new_value' => $booking->level,
+            ]);
+        }
+        
+        if ($booking->wasChanged('participants_count')) {
+            $booking->events()->create([
+                'user_id' => auth()->id(),
+                'type' => 'participants_changed',
+                'description' => 'Número de participantes actualizado',
+                'old_value' => $booking->getOriginal('participants_count'),
+                'new_value' => $booking->participants_count,
+            ]);
+        }
+
         if ($booking->interaction && $booking->wasChanged('status')) {
             $booking->interaction->events()->create([
                 'user_id' => auth()->id(),
