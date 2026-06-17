@@ -64,19 +64,47 @@ class GoogleCalendarService
 
   private function buildDescription(Booking $booking): string
   {
+    $language = match ($booking->language) {
+      'es' => 'Español',
+      'en' => 'Inglés',
+      'fr' => 'Francés',
+      'de' => 'Alemán',
+      'it' => 'Italiano',
+      default => 'No especificado',
+    };
+
+    $level = match ($booking->level) {
+      'beginner' => 'Principiante',
+      'intermediate' => 'Intermedio',
+      'advanced' => 'Avanzado',
+      'professional' => 'Profesional',
+      default => 'No especificado',
+    };
+
     return trim("
 Reserva creada desde Aurora CRM.
 
-Cliente: {$booking->customer->first_name} {$booking->customer->last_name}
-Email: {$booking->customer->email}
-Teléfono: {$booking->customer->phone}
+Cliente:
+{$booking->customer?->first_name} {$booking->customer?->last_name}
 
+Contacto:
+Email: {$booking->customer?->email}
+Teléfono: {$booking->customer?->phone}
+
+Reserva:
 Origen: {$booking->source?->name}
 Servicio: {$booking->service?->name}
+Participantes: {$booking->participants_count}
+Idioma: {$language}
+Nivel: {$level}
+
+Horario:
+Inicio: {$booking->starts_at?->format('d/m/Y H:i')}
+Fin: {$booking->ends_at?->format('d/m/Y H:i')}
 
 Notas:
 {$booking->notes}
-        ");
+    ");
   }
 
   public function deleteEvent(string $eventId): void

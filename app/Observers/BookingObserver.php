@@ -162,7 +162,7 @@ class BookingObserver
                 'new_value' => $booking->level,
             ]);
         }
-        
+
         if ($booking->wasChanged('participants_count')) {
             $booking->events()->create([
                 'user_id' => auth()->id(),
@@ -249,6 +249,9 @@ class BookingObserver
                 'service_id',
                 'customer_id',
                 'source_id',
+                'participants_count',
+                'language',
+                'level',
             ])
         ) {
             try {
