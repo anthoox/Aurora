@@ -19,12 +19,16 @@ class Booking extends Model
         'notes',
         'google_event_id',
         'google_synced_at',
+        'participants_count',
+        'language',
+        'level',
     ];
 
     protected $casts = [
         'starts_at' => 'datetime',
         'ends_at' => 'datetime',
         'google_synced_at' => 'datetime',
+        'participants_count' => 'integer',
     ];
     public function customer()
     {

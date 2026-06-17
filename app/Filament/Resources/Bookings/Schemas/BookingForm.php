@@ -63,7 +63,47 @@ class BookingForm
                             ->preload()
                             ->placeholder('Selecciona primero un origen')
                             ->required(),
+                        Select::make('participants_count')
+                            ->label('Participantes')
+                            ->options([
+                                1 => '1 participante',
+                                2 => '2 participantes',
+                                3 => '3 participantes',
+                                4 => '4 participantes',
+                                5 => '5 participantes',
+                                6 => '6 participantes',
+                                7 => '7 participantes',
+                                8 => '8 participantes',
+                                9 => '9 participantes',
+                                10 => '10 participantes',
+                                15 => '15 participantes',
+                                20 => '20 participantes',
+                            ])
+                            ->default(1)
+                            ->required(),
+
+                        Select::make('language')
+                            ->label('Idioma')
+                            ->options([
+                                'es' => 'Español',
+                                'en' => 'Inglés',
+                                'fr' => 'Francés',
+                                'de' => 'Alemán',
+                                'it' => 'Italiano',
+                            ])
+                            ->searchable(),
+
+                        Select::make('level')
+                            ->label('Nivel')
+                            ->options([
+                                'beginner' => 'Principiante',
+                                'intermediate' => 'Intermedio',
+                                'advanced' => 'Avanzado',
+                                'professional' => 'Profesional',
+                            ])
+                            ->searchable(),
                     ])
+                    
                     ->columns(2),
 
                 Section::make('Fecha y estado')

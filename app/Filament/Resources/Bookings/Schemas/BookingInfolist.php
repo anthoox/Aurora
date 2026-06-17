@@ -46,6 +46,31 @@ class BookingInfolist
                                     ? '1 hora'
                                     : "{$hours} horas";
                             }),
+                        TextEntry::make('participants_count')
+                            ->label('Participantes')
+                            ->badge()
+                            ->color('info'),
+
+                        TextEntry::make('language')
+                            ->label('Idioma')
+                            ->formatStateUsing(fn(?string $state): string => match ($state) {
+                                'es' => 'Español',
+                                'en' => 'Inglés',
+                                'fr' => 'Francés',
+                                'de' => 'Alemán',
+                                'it' => 'Italiano',
+                                default => '-',
+                            }),
+
+                        TextEntry::make('level')
+                            ->label('Nivel')
+                            ->formatStateUsing(fn(?string $state): string => match ($state) {
+                                'beginner' => 'Principiante',
+                                'intermediate' => 'Intermedio',
+                                'advanced' => 'Avanzado',
+                                'professional' => 'Profesional',
+                                default => '-',
+                            }),
                     ])
                     ->columns(4),
 
