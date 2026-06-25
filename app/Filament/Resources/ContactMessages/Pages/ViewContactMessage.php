@@ -33,7 +33,20 @@ class ViewContactMessage extends ViewRecord
                         . '?subject=' . rawurlencode($subject)
                         . '&body=' . rawurlencode($body);
                 }),
-
+            Action::make('markAsResponded')
+                ->label('Marcar como respondido')
+                ->icon('heroicon-o-check-circle')
+                ->color('success')
+                ->visible(fn() => $this->record->status === 'nuevo')
+                ->requiresConfirmation()
+                ->modalHeading('Marcar contacto como respondido')
+                ->modalDescription('El contacto pasará a estado respondido y se guardará la fecha de respuesta.')
+                ->action(function (): void {
+                    $this->record->update([
+                        'status' => 'respondido',
+                        'responded_at' => now(),
+                    ]);
+                }),
             Action::make('whatsapp')
                 ->label('WhatsApp')
                 ->icon('heroicon-o-chat-bubble-left-right')
