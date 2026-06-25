@@ -5,7 +5,9 @@ namespace App\Filament\Resources\ContactMessages;
 use App\Filament\Resources\ContactMessages\Pages\CreateContactMessage;
 use App\Filament\Resources\ContactMessages\Pages\EditContactMessage;
 use App\Filament\Resources\ContactMessages\Pages\ListContactMessages;
+use App\Filament\Resources\ContactMessages\Pages\ViewContactMessage;
 use App\Filament\Resources\ContactMessages\Schemas\ContactMessageForm;
+use App\Filament\Resources\ContactMessages\Schemas\ContactMessageInfolist;
 use App\Filament\Resources\ContactMessages\Tables\ContactMessagesTable;
 use App\Models\ContactMessage;
 use BackedEnum;
@@ -18,13 +20,22 @@ class ContactMessageResource extends Resource
 {
     protected static ?string $model = ContactMessage::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedEnvelope;
 
     protected static ?string $recordTitleAttribute = 'email';
+
+    protected static ?string $navigationLabel = 'Contactos';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'CRM';
 
     public static function form(Schema $schema): Schema
     {
         return ContactMessageForm::configure($schema);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return ContactMessageInfolist::configure($schema);
     }
 
     public static function table(Table $table): Table
@@ -34,9 +45,7 @@ class ContactMessageResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
@@ -44,6 +53,7 @@ class ContactMessageResource extends Resource
         return [
             'index' => ListContactMessages::route('/'),
             'create' => CreateContactMessage::route('/create'),
+            'view' => ViewContactMessage::route('/{record}'),
             'edit' => EditContactMessage::route('/{record}/edit'),
         ];
     }
