@@ -2,11 +2,15 @@
 
 namespace App\Filament\Resources\ContactMessages\Pages;
 
+use App\Models\Interaction;
+use App\Models\Service;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use App\Filament\Resources\ContactMessages\ContactMessageResource;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
-
+use App\Filament\Resources\Interactions\InteractionResource;
 class ViewContactMessage extends ViewRecord
 {
     protected static string $resource = ContactMessageResource::class;
@@ -65,7 +69,71 @@ class ViewContactMessage extends ViewRecord
                     return 'https://wa.me/' . $phone . '?text=' . urlencode($message);
                 })
                 ->openUrlInNewTab(),
+            Action::make('convertToLead')
+                ->label('Convertir a lead')
+                ->icon('heroicon-o-arrow-path')
+                ->color('primary')
+                ->visible(fn() => $this->record->status !== 'convertido')
+                ->form([
+                    Select::make('service_id')
+                        ->label('Servicio')
+                        ->options(function () {
+                            if (!$this->record->source_id) {
+                                return Service::query()
+                                    ->pluck('name', 'id');
+                            }
 
+                            return Service::query()
+                                ->whereHas('sources', function ($query) {
+                                    $query
+                                        ->where('sources.id', $this->record->source_id)
+                                        ->where('service_source.is_active', true);
+                                })
+                                ->pluck('name', 'id');
+                        })
+                        ->searchable()
+                        ->preload()
+                        ->required(),
+
+                    Select::make('status')
+                        ->label('Estado inicial del lead')
+                        ->options([
+                            'nuevo' => 'Nuevo',
+                            'contactado' => 'Contactado',
+                        ])
+                        ->default('nuevo')
+                        ->required(),
+
+                    Textarea::make('notes')
+                        ->label('Notas internas')
+                        ->default(fn() => "Lead creado desde mensaje de contacto.\n\nMensaje original:\n{$this->record->message}")
+                        ->rows(5),
+                ])
+                ->requiresConfirmation()
+                ->modalHeading('Convertir contacto a lead')
+                ->modalDescription('Se creará una nueva interacción comercial asociada a este cliente.')
+                ->action(function (array $data): void {
+                    $interaction = Interaction::create([
+                        'customer_id' => $this->record->customer_id,
+                        'source_id' => $this->record->source_id,
+                        'service_id' => $data['service_id'],
+                        'status' => $data['status'],
+                        'notes' => $data['notes'] ?? null,
+                        'origin_type' => 'contact',
+                        'message' => $this->record->message,
+                    ]);
+
+                    $this->record->update([
+                        'status' => 'convertido',
+                        'converted_at' => now(),
+                    ]);
+
+                    $this->redirect(
+                        InteractionResource::getUrl('view', [
+                            'record' => $interaction,
+                        ])
+                    );
+                }),
             EditAction::make(),
         ];
     }
