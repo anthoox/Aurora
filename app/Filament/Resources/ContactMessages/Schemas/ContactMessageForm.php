@@ -24,12 +24,6 @@ class ContactMessageForm
                                 'archivado' => 'Archivado',
                             ])
                             ->required(),
-
-                        Textarea::make('message')
-                            ->label('Mensaje')
-                            ->rows(6)
-                            ->disabled()
-                            ->dehydrated(),
                     ]),
             ]);
     }
