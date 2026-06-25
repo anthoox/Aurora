@@ -343,7 +343,7 @@ Convertir Aurora en una herramienta de análisis comercial.
 - añadir servicios reales con precios reales
 - añadir configuración de servicios reales
 
-## 13. Gestión comercial y ventas - PENDIENTE
+## 13. Gestión comercial y ventas - no por ahora.
 
 ### Objetivo
 Controlar presupuestos y ventas. pero eso se tiene que hacer siempre que se vaya creando la reserva. al añadi el servicio se le añade el precio pero falta poner la cantidad de participanetes. Añadir ofertas y esas cosas perio creo q eso lo decidire una vez vea el catalogo real de mi cliente. por ahora todo es una configuración basica. pero hay que añadir sus servicios, clases, sus webs, sus oferas
@@ -392,10 +392,10 @@ Preparar Aurora para equipos.
 
 - [ ] Que adminitrador total añada campos nuevos en cada recurso
 - [ ] Enviar email tras confirmar reserva y que invite a añadirlo a su calendar
-- [ ] Timeline para todos (reservas, interacciones sobre todo)
 - [ ] Emails automáticos
 - [ ] Españolizar
 - [ ] Mejorar diseño y colores de todas las vistas
+- [ ] Orden de las tablas por defecto (ultimo en llegar primero en mostrar)
 - [ ] Exportación PDF/Excel
 - [ ] Alertas internas
 - [ ] Formularios wordpress

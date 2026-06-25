@@ -36,4 +36,9 @@ class ContactMessage extends Model
     {
         return $this->belongsTo(Source::class);
     }
+
+    public function events()
+    {
+        return $this->hasMany(ContactMessageEvent::class);
+    }
 }
