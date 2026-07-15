@@ -17,6 +17,16 @@ class Analytics extends Page
 
     protected string $view = 'filament.pages.analytics';
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasAnyRole(['admin', 'manager']) ?? false;
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->hasAnyRole(['admin', 'manager']) ?? false;
+    }
+    
     protected function getHeaderWidgets(): array
     {
         return [

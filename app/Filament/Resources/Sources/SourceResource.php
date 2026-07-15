@@ -42,7 +42,15 @@ class SourceResource extends Resource
             ServicesRelationManager::class,
         ];
     }
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasRole('admin') ?? false;
+    }
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->hasRole('admin') ?? false;
+    }
     public static function getPages(): array
     {
         return [

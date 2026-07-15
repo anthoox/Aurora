@@ -42,6 +42,16 @@ class ServiceResource extends Resource
         ];
     }
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasAnyRole(['admin', 'manager']) ?? false;
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->hasAnyRole(['admin', 'manager']) ?? false;
+    }
+
     public static function getPages(): array
     {
         return [
