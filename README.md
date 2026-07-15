@@ -340,27 +340,9 @@ Convertir Aurora en una herramienta de análisis comercial.
 
 ---
 # 🔮 Ideas futuras
-- añadir servicios reales con precios reales
-- añadir configuración de servicios reales
 
-## 13. Gestión comercial y ventas - no por ahora.
 
-### Objetivo
-Controlar presupuestos y ventas. pero eso se tiene que hacer siempre que se vaya creando la reserva. al añadi el servicio se le añade el precio pero falta poner la cantidad de participanetes. Añadir ofertas y esas cosas perio creo q eso lo decidire una vez vea el catalogo real de mi cliente. por ahora todo es una configuración basica. pero hay que añadir sus servicios, clases, sus webs, sus oferas
 
-### Funcionalidades
-- [ ] Precio estimado
-- [ ] Precio final
-- [ ] Forma de pago
-- [ ] Estado comercial
-- [ ] Mensajeria por emails de contacto
-
-### Aprendizajes
-- Flujo comercial
-- Estados financieros
-- CRM avanzado
-
----
 
 # 👥 FASE 5 — Escalado
 
@@ -369,7 +351,7 @@ Preparar Aurora para equipos.
 
 ---
 
-## 14. Usuarios y roles
+## 13. Usuarios y roles
 
 ### Roles
 - [ ] Administrador
@@ -387,9 +369,27 @@ Preparar Aurora para equipos.
 - Multiusuario
 
 ---
+## 14. Gestión comercial y ventas - no por ahora.
 
+### Objetivo
+Controlar presupuestos y ventas. pero eso se tiene que hacer siempre que se vaya creando la reserva. al añadi el servicio se le añade el precio pero falta poner la cantidad de participanetes. Añadir ofertas y esas cosas perio creo q eso lo decidire una vez vea el catalogo real de mi cliente. por ahora todo es una configuración basica. pero hay que añadir sus servicios, clases, sus webs, sus oferas
+
+### Funcionalidades
+- [ ] Precio estimado
+- [ ] Precio final
+- [ ] Forma de pago
+- [ ] Estado comercial
+- [ ] Mensajeria por emails de contacto
+
+### Aprendizajes
+- Flujo comercial
+- Estados financieros
+- CRM avanzado
+
+---
 # 🔮 Ideas futuras
-
+- [ ] añadir servicios reales con precios reales
+- [ ] añadir configuración de servicios reales
 - [ ] Que adminitrador total añada campos nuevos en cada recurso
 - [ ] Enviar email tras confirmar reserva y que invite a añadirlo a su calendar
 - [ ] Emails automáticos
