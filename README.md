@@ -387,6 +387,12 @@ Controlar presupuestos y ventas. pero eso se tiene que hacer siempre que se vaya
 - CRM avanzado
 
 ---
+
+De hecho, más adelante te recomendaría homogeneizar ContactMessageController, porque actualmente ahí tienes: ->firstOrFail();
+
+mientras que LeadController devuelve correctamente 401.
+
+
 # 🔮 Ideas futuras
 - [ ] añadir servicios reales con precios reales
 - [ ] añadir configuración de servicios reales
