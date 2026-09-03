@@ -16,12 +16,12 @@ class BookingInfolist
                     ->schema([
                         TextEntry::make('id')
                             ->label('Reserva')
-                            ->formatStateUsing(fn($state) => 'RES-' . $state),
+                            ->formatStateUsing(fn ($state) => 'RES-'.$state),
 
                         TextEntry::make('status')
                             ->label('Estado')
                             ->badge()
-                            ->color(fn(string $state): string => match ($state) {
+                            ->color(fn (string $state): string => match ($state) {
                                 'pendiente' => 'warning',
                                 'confirmada' => 'success',
                                 'cancelada' => 'danger',
@@ -31,20 +31,42 @@ class BookingInfolist
 
                         TextEntry::make('starts_at')
                             ->label('Fecha y hora')
-                            ->dateTime('d/m/Y H:i'),
+                            ->dateTime('d/m/Y H:i')
+                            ->placeholder('Hora pendiente de asignar'),
+
+                        TextEntry::make('requested_date')
+                            ->label('Fecha solicitada')
+                            ->date('d/m/Y')
+                            ->placeholder('Sin fecha solicitada'),
+
+                        TextEntry::make('booking_mode')
+                            ->label('Modalidad')
+                            ->badge()
+                            ->formatStateUsing(fn (string $state): string => match ($state) {
+                                'date_only' => 'Solicitud por fecha',
+                                'time_slots' => 'Reserva con horario',
+                                default => $state,
+                            }),
 
                         TextEntry::make('duration')
                             ->label('Duración')
                             ->state(function ($record): string {
-                                if (!$record->starts_at || !$record->ends_at) {
+                                if (! $record->starts_at || ! $record->ends_at) {
                                     return 'Sin duración';
                                 }
 
-                                $hours = $record->starts_at->diffInHours($record->ends_at);
+                                $minutes = (int) $record->starts_at->diffInMinutes($record->ends_at);
 
-                                return $hours === 1
-                                    ? '1 hora'
-                                    : "{$hours} horas";
+                                if ($minutes < 60) {
+                                    return "{$minutes} minutos";
+                                }
+
+                                $hours = intdiv($minutes, 60);
+                                $remainingMinutes = $minutes % 60;
+
+                                return $remainingMinutes === 0
+                                    ? ($hours === 1 ? '1 hora' : "{$hours} horas")
+                                    : "{$hours} h {$remainingMinutes} min";
                             }),
                         TextEntry::make('participants_count')
                             ->label('Participantes')
@@ -53,7 +75,7 @@ class BookingInfolist
 
                         TextEntry::make('language')
                             ->label('Idioma')
-                            ->formatStateUsing(fn(?string $state): string => match ($state) {
+                            ->formatStateUsing(fn (?string $state): string => match ($state) {
                                 'es' => 'Español',
                                 'en' => 'Inglés',
                                 'fr' => 'Francés',
@@ -64,7 +86,7 @@ class BookingInfolist
 
                         TextEntry::make('level')
                             ->label('Nivel')
-                            ->formatStateUsing(fn(?string $state): string => match ($state) {
+                            ->formatStateUsing(fn (?string $state): string => match ($state) {
                                 'beginner' => 'Principiante',
                                 'intermediate' => 'Intermedio',
                                 'advanced' => 'Avanzado',
@@ -105,7 +127,7 @@ class BookingInfolist
 
                         TextEntry::make('interaction.id')
                             ->label('Lead relacionado')
-                            ->formatStateUsing(fn($state) => $state ? 'INT-' . $state : null)
+                            ->formatStateUsing(fn ($state) => $state ? 'INT-'.$state : null)
                             ->placeholder('Reserva directa'),
                     ])
                     ->columns(3),
@@ -128,6 +150,14 @@ class BookingInfolist
                         TextEntry::make('notes')
                             ->label('')
                             ->placeholder('Sin notas internas')
+                            ->columnSpanFull(),
+                    ]),
+
+                Section::make('Mensaje del cliente')
+                    ->schema([
+                        TextEntry::make('customer_message')
+                            ->label('')
+                            ->placeholder('Sin mensaje del cliente')
                             ->columnSpanFull(),
                     ]),
             ]);

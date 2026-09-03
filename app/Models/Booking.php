@@ -3,20 +3,21 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Booking extends Model
 {
-
     protected $fillable = [
         'customer_id',
         'interaction_id',
         'service_id',
         'source_id',
+        'booking_mode',
+        'requested_date',
         'starts_at',
         'ends_at',
         'status',
         'notes',
+        'customer_message',
         'google_event_id',
         'google_synced_at',
         'participants_count',
@@ -25,11 +26,13 @@ class Booking extends Model
     ];
 
     protected $casts = [
+        'requested_date' => 'date',
         'starts_at' => 'datetime',
         'ends_at' => 'datetime',
         'google_synced_at' => 'datetime',
         'participants_count' => 'integer',
     ];
+
     public function customer()
     {
         return $this->belongsTo(Customer::class);
@@ -49,6 +52,7 @@ class Booking extends Model
     {
         return $this->belongsTo(Source::class);
     }
+
     public function canBeEdited(): bool
     {
         if (in_array($this->status, ['realizada', 'cancelada'])) {
@@ -66,5 +70,4 @@ class Booking extends Model
     {
         return $this->hasMany(BookingEvent::class);
     }
-    
 }

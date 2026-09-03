@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\Bookings\Tables;
 
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
@@ -17,7 +15,7 @@ class BookingsTable
             ->columns([
                 TextColumn::make('id')
                     ->label('Reserva')
-                    ->formatStateUsing(fn($state) => 'RES-' . $state)
+                    ->formatStateUsing(fn ($state) => 'RES-'.$state)
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('customer.email')
@@ -42,20 +40,34 @@ class BookingsTable
                 TextColumn::make('starts_at')
                     ->label('Fecha Reserva')
                     ->dateTime('d/m/Y H:i')
+                    ->placeholder('Hora pendiente')
+                    ->sortable(),
+
+                TextColumn::make('requested_date')
+                    ->label('Fecha solicitada')
+                    ->date('d/m/Y')
+                    ->placeholder('—')
                     ->sortable(),
 
                 TextColumn::make('duration')
                     ->label('Duración')
                     ->state(function ($record): string {
-                        if (!$record->starts_at || !$record->ends_at) {
+                        if (! $record->starts_at || ! $record->ends_at) {
                             return 'Sin duración';
                         }
 
-                        $hours = $record->starts_at->diffInHours($record->ends_at);
+                        $minutes = (int) $record->starts_at->diffInMinutes($record->ends_at);
 
-                        return $hours === 1
-                            ? '1 hora'
-                            : "{$hours} horas";
+                        if ($minutes < 60) {
+                            return "{$minutes} minutos";
+                        }
+
+                        $hours = intdiv($minutes, 60);
+                        $remainingMinutes = $minutes % 60;
+
+                        return $remainingMinutes === 0
+                            ? ($hours === 1 ? '1 hora' : "{$hours} horas")
+                            : "{$hours} h {$remainingMinutes} min";
                     })
                     ->badge()
                     ->color('gray'),
@@ -64,7 +76,7 @@ class BookingsTable
                     ->label('Estado')
                     ->badge()
                     ->sortable()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'pendiente' => 'warning',
                         'confirmada' => 'success',
                         'cancelada' => 'danger',
@@ -73,9 +85,9 @@ class BookingsTable
                     }),
                 TextColumn::make('booking_origin')
                     ->label('Tipo')
-                    ->state(fn($record): string => $record->interaction_id ? 'Desde lead' : 'Manual')
+                    ->state(fn ($record): string => $record->interaction_id ? 'Desde lead' : 'Manual')
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'Desde lead' => 'info',
                         'Manual' => 'gray',
                         default => 'gray',
@@ -85,7 +97,6 @@ class BookingsTable
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-
 
                 TextColumn::make('updated_at')
                     ->label('Actualizada')
@@ -99,13 +110,13 @@ class BookingsTable
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make()
-                    ->disabled(fn($record) => !$record->canBeEdited())
+                    ->disabled(fn ($record) => ! $record->canBeEdited())
                     ->tooltip(
-                        fn($record) => $record->canBeEdited()
+                        fn ($record) => $record->canBeEdited()
                         ? 'Editar reserva'
                         : 'Esta reserva no se puede editar por su estado o porque ya ha finalizado'
                     )
-                    ->color(fn($record) => $record->canBeEdited() ? 'primary' : 'gray'),
+                    ->color(fn ($record) => $record->canBeEdited() ? 'primary' : 'gray'),
             ]);
     }
 }

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Source extends Model
 {
     protected $fillable = ['name', 'slug', 'api_token', 'is_active'];
+
     public function services(): BelongsToMany
     {
         return $this->belongsToMany(Service::class)
@@ -20,8 +21,6 @@ class Source extends Model
             ->withTimestamps();
     }
 
-
-
     /**
      * Leads que han entrado a través de esta web.
      */
@@ -29,5 +28,9 @@ class Source extends Model
     {
         return $this->hasMany(Interaction::class);
     }
-    
+
+    public function bookings(): HasMany
+    {
+        return $this->hasMany(Booking::class);
+    }
 }

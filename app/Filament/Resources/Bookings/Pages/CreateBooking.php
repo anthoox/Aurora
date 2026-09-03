@@ -23,11 +23,11 @@ class CreateBooking extends CreateRecord
 
         $data['starts_at'] = $startsAt;
         $data['ends_at'] = $startsAt->copy()->addHours((int) $data['duration_hours']);
+        $data['requested_date'] = $data['booking_date'];
 
         unset($data['booking_date'], $data['start_time'], $data['duration_hours']);
 
         return $data;
     }
 }
-
 

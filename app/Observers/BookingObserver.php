@@ -4,11 +4,30 @@ namespace App\Observers;
 
 use App\Models\Booking;
 use App\Services\GoogleCalendarService;
-use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class BookingObserver
 {
+    public function saving(Booking $booking): void
+    {
+        if (
+            in_array($booking->status, ['confirmada', 'realizada'], true)
+            && (! $booking->starts_at || ! $booking->ends_at)
+        ) {
+            throw ValidationException::withMessages([
+                'status' => 'Una reserva confirmada o realizada debe tener horario de inicio y fin.',
+            ]);
+        }
+
+        if ($booking->starts_at && $booking->ends_at && $booking->ends_at->lessThanOrEqualTo($booking->starts_at)) {
+            throw ValidationException::withMessages([
+                'ends_at' => 'La hora de fin debe ser posterior a la hora de inicio.',
+            ]);
+        }
+    }
+
     /**
      * Handle the Booking "created" event.
      */
@@ -151,8 +170,6 @@ class BookingObserver
             ]);
         }
 
-
-
         if ($booking->wasChanged('level')) {
             $booking->events()->create([
                 'user_id' => auth()->id(),
@@ -205,7 +222,7 @@ class BookingObserver
         |--------------------------------------------------------------------------
         */
 
-        if ($booking->wasChanged('status') && $booking->status === 'confirmada' && !$booking->google_event_id) {
+        if ($booking->wasChanged('status') && $booking->status === 'confirmada' && ! $booking->google_event_id) {
             try {
                 $googleEventId = app(GoogleCalendarService::class)
                     ->createEventFromBooking($booking);

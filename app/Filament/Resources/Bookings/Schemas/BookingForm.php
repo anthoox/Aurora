@@ -114,9 +114,9 @@ class BookingForm
                             ->minDate(today())
                             ->required()
                             ->afterStateHydrated(function ($component, $record) {
-                                if ($record?->starts_at) {
+                                if ($record?->starts_at || $record?->requested_date) {
                                     $component->state(
-                                        $record->starts_at->toDateString()
+                                        ($record->starts_at ?? $record->requested_date)->toDateString()
                                     );
                                 }
                             }),
