@@ -34,8 +34,8 @@ class BookingController extends Controller
             'email' => ['required', 'email', 'max:255'],
             'phone' => ['nullable', 'string', 'max:255'],
             'service_id' => ['required', 'integer'],
-            'booking_date' => ['required', 'date_format:Y-m-d', 'after_or_equal:today'],
-            'message' => ['nullable', 'string'],
+            'requested_date' => ['required', 'date_format:Y-m-d', 'after_or_equal:today'],
+            'customer_message' => ['nullable', 'string'],
         ]);
 
         $service = $source->services()
@@ -64,11 +64,11 @@ class BookingController extends Controller
                 'service_id' => $service->id,
                 'source_id' => $source->id,
                 'booking_mode' => 'date_only',
-                'requested_date' => $data['booking_date'],
+                'requested_date' => $data['requested_date'],
                 'starts_at' => null,
                 'ends_at' => null,
                 'status' => 'pendiente',
-                'customer_message' => $data['message'] ?? null,
+                'customer_message' => $data['customer_message'] ?? null,
             ]);
         });
 
