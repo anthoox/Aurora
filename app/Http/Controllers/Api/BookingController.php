@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Customer;
 use App\Models\Source;
+use App\Services\BookingScheduler;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,7 +16,7 @@ use Illuminate\Validation\ValidationException;
 
 class BookingController extends Controller
 {
-    public function store(Request $request): JsonResponse
+    public function store(Request $request, BookingScheduler $bookingScheduler): JsonResponse
     {
         $source = Source::query()
             ->where('api_token', $request->header('X-Aurora-Token'))
@@ -28,13 +30,14 @@ class BookingController extends Controller
         }
 
         $data = $request->validate([
-            'booking_mode' => ['required', Rule::in(['date_only'])],
+            'booking_mode' => ['required', Rule::in(['date_only', 'time_slots'])],
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255'],
             'phone' => ['nullable', 'string', 'max:255'],
             'service_id' => ['required', 'integer'],
             'requested_date' => ['required', 'date_format:Y-m-d', 'after_or_equal:today'],
+            'booking_time' => ['nullable', 'required_if:booking_mode,time_slots', 'date_format:H:i'],
             'customer_message' => ['nullable', 'string'],
         ]);
 
@@ -47,6 +50,34 @@ class BookingController extends Controller
             throw ValidationException::withMessages([
                 'service_id' => 'El servicio no está disponible para esta fuente.',
             ]);
+        }
+
+        if ($data['booking_mode'] === 'time_slots') {
+            $startsAt = CarbonImmutable::parse(
+                $data['requested_date'].' '.$data['booking_time'],
+                config('app.timezone'),
+            );
+
+            $booking = $bookingScheduler->createTimeSlotBooking(
+                $source,
+                $service,
+                $startsAt,
+                $data,
+                $data['customer_message'] ?? null,
+            );
+
+            return response()->json([
+                'message' => 'Reserva creada y confirmada correctamente',
+                'data' => [
+                    'id' => $booking->id,
+                    'booking_mode' => $booking->booking_mode,
+                    'status' => $booking->status,
+                    'requested_date' => $booking->requested_date->toDateString(),
+                    'starts_at' => $booking->starts_at->format('Y-m-d H:i:s'),
+                    'ends_at' => $booking->ends_at->format('Y-m-d H:i:s'),
+                    'service_id' => $booking->service_id,
+                ],
+            ], 201);
         }
 
         $booking = DB::transaction(function () use ($data, $source, $service): Booking {
