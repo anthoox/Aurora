@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Booking;
+use App\Models\Customer;
 use App\Models\Service;
 use App\Models\Source;
 use App\Services\BookingAvailabilityService;
@@ -13,6 +15,8 @@ use Tests\TestCase;
 class BookingAvailabilityServiceTest extends TestCase
 {
     use RefreshDatabase;
+
+    private int $customerSequence = 0;
 
     public function test_it_returns_the_active_weekly_intervals_for_the_requested_day(): void
     {
@@ -237,6 +241,53 @@ class BookingAvailabilityServiceTest extends TestCase
         }
     }
 
+    public function test_it_removes_slots_overlapping_blocking_bookings_for_the_source(): void
+    {
+        $source = $this->source();
+        $otherSource = $this->source('other');
+        $service = $this->serviceForSource($source, 60);
+        $source->openingHours()->create([
+            'day_of_week' => 1,
+            'opens_at' => '09:00',
+            'closes_at' => '12:00',
+        ]);
+
+        $this->booking($source, 'confirmada', '2026-09-14 09:30', '2026-09-14 10:30');
+        $this->booking($source, 'pendiente', '2026-09-14 10:30', '2026-09-14 11:00');
+        $this->booking($source, 'cancelada', '2026-09-14 11:00', '2026-09-14 12:00');
+        $this->booking($source, 'pendiente');
+        $this->booking($otherSource, 'confirmada', '2026-09-14 11:00', '2026-09-14 12:00');
+
+        $slots = $this->service()->availableSlots(
+            $source,
+            $service,
+            CarbonImmutable::parse('2026-09-14'),
+        );
+
+        $this->assertSame(['11:00'], $slots->map->format('H:i')->all());
+    }
+
+    public function test_a_booking_ending_at_the_slot_start_does_not_block_it(): void
+    {
+        $source = $this->source();
+        $service = $this->serviceForSource($source, 30);
+        $source->openingHours()->create([
+            'day_of_week' => 1,
+            'opens_at' => '09:00',
+            'closes_at' => '10:00',
+        ]);
+
+        $this->booking($source, 'confirmada', '2026-09-14 08:30', '2026-09-14 09:00');
+
+        $slots = $this->service()->availableSlots(
+            $source,
+            $service,
+            CarbonImmutable::parse('2026-09-14'),
+        );
+
+        $this->assertSame(['09:00', '09:30'], $slots->map->format('H:i')->all());
+    }
+
     private function formatted($intervals): array
     {
         return $intervals
@@ -261,6 +312,28 @@ class BookingAvailabilityServiceTest extends TestCase
         ]);
 
         return $service;
+    }
+
+    private function booking(
+        Source $source,
+        string $status,
+        ?string $startsAt = null,
+        ?string $endsAt = null,
+    ): Booking {
+        $customer = Customer::create([
+            'first_name' => 'Cliente',
+            'email' => 'cliente-'.++$this->customerSequence.'@example.com',
+        ]);
+
+        return Booking::withoutEvents(fn (): Booking => Booking::create([
+            'customer_id' => $customer->id,
+            'source_id' => $source->id,
+            'booking_mode' => $startsAt ? 'time_slots' : 'date_only',
+            'requested_date' => '2026-09-14',
+            'starts_at' => $startsAt,
+            'ends_at' => $endsAt,
+            'status' => $status,
+        ]));
     }
 
     private function source(string $suffix = 'main'): Source

@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Booking extends Model
 {
+    public const AVAILABILITY_BLOCKING_STATUSES = [
+        'pendiente',
+        'confirmada',
+    ];
+
     protected $fillable = [
         'customer_id',
         'interaction_id',

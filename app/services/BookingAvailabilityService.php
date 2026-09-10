@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Booking;
 use App\Models\Service;
 use App\Models\Source;
 use Carbon\CarbonImmutable;
@@ -14,11 +15,56 @@ class BookingAvailabilityService
     /**
      * @return Collection<int, CarbonImmutable>
      */
+    public function availableSlots(
+        Source $source,
+        Service $service,
+        CarbonInterface $date,
+    ): Collection {
+        $durationMinutes = $this->durationMinutesFor($source, $service);
+        $slots = $this->candidateSlotsForDuration($source, $date, $durationMinutes);
+
+        if ($slots->isEmpty()) {
+            return $slots;
+        }
+
+        $rangeStart = $slots->first();
+        $rangeEnd = $slots->last()->addMinutes($durationMinutes);
+
+        $blockingBookings = $source->bookings()
+            ->whereIn('status', Booking::AVAILABILITY_BLOCKING_STATUSES)
+            ->whereNotNull('starts_at')
+            ->whereNotNull('ends_at')
+            ->where('starts_at', '<', $rangeEnd)
+            ->where('ends_at', '>', $rangeStart)
+            ->get(['starts_at', 'ends_at']);
+
+        return $slots
+            ->reject(function (CarbonImmutable $slot) use ($blockingBookings, $durationMinutes): bool {
+                $slotEnd = $slot->addMinutes($durationMinutes);
+
+                return $blockingBookings->contains(
+                    fn (Booking $booking): bool => $booking->starts_at->lessThan($slotEnd)
+                        && $booking->ends_at->greaterThan($slot),
+                );
+            })
+            ->values();
+    }
+
+    /**
+     * @return Collection<int, CarbonImmutable>
+     */
     public function candidateSlots(
         Source $source,
         Service $service,
         CarbonInterface $date,
     ): Collection {
+        $durationMinutes = $this->durationMinutesFor($source, $service);
+
+        return $this->candidateSlotsForDuration($source, $date, $durationMinutes);
+    }
+
+    private function durationMinutesFor(Source $source, Service $service): int
+    {
         $serviceForSource = $source->services()
             ->whereKey($service->getKey())
             ->wherePivot('is_active', true)
@@ -37,6 +83,18 @@ class BookingAvailabilityService
                 'service_id' => 'El servicio no tiene una duración configurada.',
             ]);
         }
+
+        return $durationMinutes;
+    }
+
+    /**
+     * @return Collection<int, CarbonImmutable>
+     */
+    private function candidateSlotsForDuration(
+        Source $source,
+        CarbonInterface $date,
+        int $durationMinutes,
+    ): Collection {
 
         $slotIntervalMinutes = (int) config('bookings.slot_interval_minutes');
 
