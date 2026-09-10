@@ -39,4 +39,9 @@ class Source extends Model
     {
         return $this->hasMany(SourceOpeningHour::class);
     }
+
+    public function availabilityExceptions(): HasMany
+    {
+        return $this->hasMany(SourceAvailabilityException::class);
+    }
 }

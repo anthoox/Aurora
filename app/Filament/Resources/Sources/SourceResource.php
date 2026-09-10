@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Sources;
 use App\Filament\Resources\Sources\Pages\CreateSource;
 use App\Filament\Resources\Sources\Pages\EditSource;
 use App\Filament\Resources\Sources\Pages\ListSources;
+use App\Filament\Resources\Sources\RelationManagers\AvailabilityExceptionsRelationManager;
 use App\Filament\Resources\Sources\RelationManagers\OpeningHoursRelationManager;
 use App\Filament\Resources\Sources\RelationManagers\ServicesRelationManager;
 use App\Filament\Resources\Sources\Schemas\SourceForm;
@@ -43,6 +44,7 @@ class SourceResource extends Resource
         return [
             ServicesRelationManager::class,
             OpeningHoursRelationManager::class,
+            AvailabilityExceptionsRelationManager::class,
         ];
     }
 

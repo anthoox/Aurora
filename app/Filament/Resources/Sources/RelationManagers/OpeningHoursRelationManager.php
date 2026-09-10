@@ -2,16 +2,19 @@
 
 namespace App\Filament\Resources\Sources\RelationManagers;
 
+use App\Models\SourceOpeningHour;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Components\Toggle;
+use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Validation\ValidationException;
 
 class OpeningHoursRelationManager extends RelationManager
 {
@@ -47,12 +50,17 @@ class OpeningHoursRelationManager extends RelationManager
             ->headerActions([
                 CreateAction::make()
                     ->label('Añadir tramo')
-                    ->form(self::formSchema()),
+                    ->form(self::formSchema())
+                    ->using(fn (array $data): SourceOpeningHour => $this->createOpeningHour($data))
+                    ->successNotificationTitle('Tramo horario creado'),
             ])
             ->recordActions([
                 EditAction::make()
-                    ->form(self::formSchema()),
-                DeleteAction::make(),
+                    ->form(self::formSchema())
+                    ->using(fn (SourceOpeningHour $record, array $data): SourceOpeningHour => $this->updateOpeningHour($record, $data))
+                    ->successNotificationTitle('Tramo horario actualizado'),
+                DeleteAction::make()
+                    ->successNotificationTitle('Tramo horario eliminado'),
             ]);
     }
 
@@ -75,6 +83,7 @@ class OpeningHoursRelationManager extends RelationManager
                 ->label('Hora de cierre')
                 ->seconds(false)
                 ->minutesStep(15)
+                ->after('opens_at')
                 ->required(),
 
             Toggle::make('is_active')
@@ -82,6 +91,40 @@ class OpeningHoursRelationManager extends RelationManager
                 ->default(true)
                 ->required(),
         ];
+    }
+
+    private function createOpeningHour(array $data): SourceOpeningHour
+    {
+        try {
+            return $this->getOwnerRecord()->openingHours()->create($data);
+        } catch (ValidationException $exception) {
+            $this->sendValidationWarning($exception);
+
+            throw $exception;
+        }
+    }
+
+    private function updateOpeningHour(SourceOpeningHour $openingHour, array $data): SourceOpeningHour
+    {
+        try {
+            $openingHour->update($data);
+
+            return $openingHour;
+        } catch (ValidationException $exception) {
+            $this->sendValidationWarning($exception);
+
+            throw $exception;
+        }
+    }
+
+    private function sendValidationWarning(ValidationException $exception): void
+    {
+        Notification::make()
+            ->title('No se pudo guardar el tramo horario')
+            ->body(collect($exception->errors())->flatten()->first())
+            ->warning()
+            ->persistent()
+            ->send();
     }
 
     private static function dayOptions(): array
