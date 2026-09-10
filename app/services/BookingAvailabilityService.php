@@ -2,13 +2,69 @@
 
 namespace App\Services;
 
+use App\Models\Service;
 use App\Models\Source;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
 
 class BookingAvailabilityService
 {
+    /**
+     * @return Collection<int, CarbonImmutable>
+     */
+    public function candidateSlots(
+        Source $source,
+        Service $service,
+        CarbonInterface $date,
+    ): Collection {
+        $serviceForSource = $source->services()
+            ->whereKey($service->getKey())
+            ->wherePivot('is_active', true)
+            ->first();
+
+        if (! $serviceForSource) {
+            throw ValidationException::withMessages([
+                'service_id' => 'El servicio no está disponible para esta fuente.',
+            ]);
+        }
+
+        $durationMinutes = (int) $serviceForSource->pivot->duration_minutes;
+
+        if ($durationMinutes <= 0) {
+            throw ValidationException::withMessages([
+                'service_id' => 'El servicio no tiene una duración configurada.',
+            ]);
+        }
+
+        $slotIntervalMinutes = (int) config('bookings.slot_interval_minutes');
+
+        if ($slotIntervalMinutes <= 0) {
+            throw new \LogicException('El intervalo de generación de slots debe ser mayor que cero.');
+        }
+
+        $now = CarbonImmutable::now(config('app.timezone'));
+
+        return $this->effectiveIntervals($source, $date)
+            ->flatMap(function (array $interval) use ($durationMinutes, $slotIntervalMinutes, $now): array {
+                $slots = [];
+
+                for (
+                    $slot = $interval['starts_at'];
+                    $slot->addMinutes($durationMinutes)->lessThanOrEqualTo($interval['ends_at']);
+                    $slot = $slot->addMinutes($slotIntervalMinutes)
+                ) {
+                    if ($slot->greaterThan($now)) {
+                        $slots[] = $slot;
+                    }
+                }
+
+                return $slots;
+            })
+            ->values();
+    }
+
     /**
      * @return Collection<int, array{starts_at: CarbonImmutable, ends_at: CarbonImmutable}>
      */

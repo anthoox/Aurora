@@ -2,10 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\Service;
 use App\Models\Source;
 use App\Services\BookingAvailabilityService;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
 class BookingAvailabilityServiceTest extends TestCase
@@ -122,6 +124,119 @@ class BookingAvailabilityServiceTest extends TestCase
         ], $this->formatted($intervals));
     }
 
+    public function test_it_generates_candidate_slots_that_fit_the_service_duration(): void
+    {
+        $source = $this->source();
+        $service = $this->serviceForSource($source, 60);
+        $source->openingHours()->create([
+            'day_of_week' => 1,
+            'opens_at' => '09:00',
+            'closes_at' => '10:30',
+        ]);
+
+        $slots = $this->service()->candidateSlots(
+            $source,
+            $service,
+            CarbonImmutable::parse('2026-09-14'),
+        );
+
+        $this->assertSame([
+            '09:00',
+            '09:30',
+        ], $slots->map->format('H:i')->all());
+    }
+
+    public function test_it_uses_the_duration_configured_for_the_specific_source(): void
+    {
+        $shortSource = $this->source('short');
+        $longSource = $this->source('long');
+        $service = Service::create(['name' => 'Corte']);
+
+        $shortSource->services()->attach($service, ['duration_minutes' => 30, 'is_active' => true]);
+        $longSource->services()->attach($service, ['duration_minutes' => 60, 'is_active' => true]);
+
+        foreach ([$shortSource, $longSource] as $source) {
+            $source->openingHours()->create([
+                'day_of_week' => 1,
+                'opens_at' => '09:00',
+                'closes_at' => '10:30',
+            ]);
+        }
+
+        $date = CarbonImmutable::parse('2026-09-14');
+
+        $this->assertSame(
+            ['09:00', '09:30', '10:00'],
+            $this->service()->candidateSlots($shortSource, $service, $date)->map->format('H:i')->all(),
+        );
+
+        $this->assertSame(
+            ['09:00', '09:30'],
+            $this->service()->candidateSlots($longSource, $service, $date)->map->format('H:i')->all(),
+        );
+    }
+
+    public function test_a_service_without_duration_cannot_generate_slots(): void
+    {
+        $source = $this->source();
+        $service = $this->serviceForSource($source, null);
+
+        $this->expectException(ValidationException::class);
+
+        $this->service()->candidateSlots(
+            $source,
+            $service,
+            CarbonImmutable::parse('2026-09-14'),
+        );
+    }
+
+    public function test_an_inactive_service_cannot_generate_slots(): void
+    {
+        $source = $this->source();
+        $service = Service::create(['name' => 'Corte']);
+        $source->services()->attach($service, [
+            'duration_minutes' => 30,
+            'is_active' => false,
+        ]);
+
+        $this->expectException(ValidationException::class);
+
+        $this->service()->candidateSlots(
+            $source,
+            $service,
+            CarbonImmutable::parse('2026-09-14'),
+        );
+    }
+
+    public function test_past_slots_are_not_returned(): void
+    {
+        CarbonImmutable::setTestNow('2026-09-14 10:05:00');
+
+        try {
+            $source = $this->source();
+            $service = $this->serviceForSource($source, 30);
+            $source->openingHours()->create([
+                'day_of_week' => 1,
+                'opens_at' => '09:00',
+                'closes_at' => '12:00',
+            ]);
+
+            $slots = $this->service()->candidateSlots(
+                $source,
+                $service,
+                CarbonImmutable::parse('2026-09-14'),
+            );
+
+            $this->assertSame([
+                '10:30',
+                '11:00',
+                '11:30',
+            ], $slots->map->format('H:i')->all());
+        } finally {
+            CarbonImmutable::setTestNow();
+        }
+    }
+
     private function formatted($intervals): array
     {
         return $intervals
@@ -137,12 +252,23 @@ class BookingAvailabilityServiceTest extends TestCase
         return app(BookingAvailabilityService::class);
     }
 
-    private function source(): Source
+    private function serviceForSource(Source $source, ?int $durationMinutes): Service
+    {
+        $service = Service::create(['name' => 'Corte']);
+        $source->services()->attach($service, [
+            'duration_minutes' => $durationMinutes,
+            'is_active' => true,
+        ]);
+
+        return $service;
+    }
+
+    private function source(string $suffix = 'main'): Source
     {
         return Source::create([
-            'name' => 'Web principal',
-            'slug' => 'web-principal',
-            'api_token' => 'valid-token',
+            'name' => "Web {$suffix}",
+            'slug' => "web-{$suffix}",
+            'api_token' => "token-{$suffix}",
             'is_active' => true,
         ]);
     }
