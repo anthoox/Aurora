@@ -124,10 +124,10 @@ class BookingAvailabilityService
         int $durationMinutes,
     ): Collection {
 
-        $slotIntervalMinutes = (int) config('bookings.slot_interval_minutes');
+        $slotIntervalMinutes = (int) $source->slot_interval_minutes;
 
-        if ($slotIntervalMinutes <= 0) {
-            throw new \LogicException('El intervalo de generación de slots debe ser mayor que cero.');
+        if (! in_array($slotIntervalMinutes, config('bookings.allowed_slot_intervals'), true)) {
+            throw new \LogicException('El Source no tiene un intervalo de generación de slots válido.');
         }
 
         $now = CarbonImmutable::now(config('app.timezone'));

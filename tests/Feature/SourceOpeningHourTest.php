@@ -77,6 +77,20 @@ class SourceOpeningHourTest extends TestCase
         $this->assertSame(2, SourceOpeningHour::count());
     }
 
+    public function test_a_source_uses_thirty_minutes_as_its_default_slot_interval(): void
+    {
+        $this->assertSame(30, $this->source()->slot_interval_minutes);
+    }
+
+    public function test_a_source_rejects_an_unsupported_slot_interval(): void
+    {
+        $this->expectException(ValidationException::class);
+
+        $this->source()->update([
+            'slot_interval_minutes' => 10,
+        ]);
+    }
+
     private function source(string $suffix = 'main'): Source
     {
         return Source::create([

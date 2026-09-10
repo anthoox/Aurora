@@ -150,6 +150,68 @@ class BookingAvailabilityServiceTest extends TestCase
         ], $slots->map->format('H:i')->all());
     }
 
+    public function test_all_weekly_ranges_use_the_source_slot_interval(): void
+    {
+        $source = $this->source();
+        $source->update(['slot_interval_minutes' => 60]);
+        $service = $this->serviceForSource($source, 30);
+        $source->openingHours()->createMany([
+            [
+                'day_of_week' => 1,
+                'opens_at' => '09:00',
+                'closes_at' => '12:00',
+            ],
+            [
+                'day_of_week' => 1,
+                'opens_at' => '18:00',
+                'closes_at' => '20:00',
+            ],
+        ]);
+
+        $slots = $this->service()->candidateSlots(
+            $source,
+            $service,
+            CarbonImmutable::parse('2026-09-14'),
+        );
+
+        $this->assertSame([
+            '09:00',
+            '10:00',
+            '11:00',
+            '18:00',
+            '19:00',
+        ], $slots->map->format('H:i')->all());
+    }
+
+    public function test_special_ranges_use_the_source_slot_interval(): void
+    {
+        $source = $this->source();
+        $source->update(['slot_interval_minutes' => 45]);
+        $service = $this->serviceForSource($source, 30);
+        $source->openingHours()->create([
+            'day_of_week' => 1,
+            'opens_at' => '09:00',
+            'closes_at' => '14:00',
+        ]);
+        $source->availabilityExceptions()->create([
+            'date' => '2026-09-14',
+            'opens_at' => '10:00',
+            'closes_at' => '12:00',
+        ]);
+
+        $slots = $this->service()->candidateSlots(
+            $source,
+            $service,
+            CarbonImmutable::parse('2026-09-14'),
+        );
+
+        $this->assertSame([
+            '10:00',
+            '10:45',
+            '11:30',
+        ], $slots->map->format('H:i')->all());
+    }
+
     public function test_it_uses_the_duration_configured_for_the_specific_source(): void
     {
         $shortSource = $this->source('short');

@@ -5,10 +5,35 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Validation\ValidationException;
 
 class Source extends Model
 {
-    protected $fillable = ['name', 'slug', 'api_token', 'is_active'];
+    protected $fillable = [
+        'name',
+        'slug',
+        'api_token',
+        'is_active',
+        'slot_interval_minutes',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'slot_interval_minutes' => 'integer',
+    ];
+
+    protected static function booted(): void
+    {
+        static::saving(function (self $source): void {
+            $source->slot_interval_minutes ??= config('bookings.default_slot_interval_minutes');
+
+            if (! in_array($source->slot_interval_minutes, config('bookings.allowed_slot_intervals'), true)) {
+                throw ValidationException::withMessages([
+                    'slot_interval_minutes' => 'El intervalo entre reservas no es válido.',
+                ]);
+            }
+        });
+    }
 
     public function services(): BelongsToMany
     {
