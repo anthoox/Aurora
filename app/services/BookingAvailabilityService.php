@@ -13,6 +13,22 @@ use Illuminate\Validation\ValidationException;
 class BookingAvailabilityService
 {
     /**
+     * @return array{duration_minutes: int, slots: Collection<int, CarbonImmutable>}
+     */
+    public function availabilityFor(
+        Source $source,
+        Service $service,
+        CarbonInterface $date,
+    ): array {
+        $durationMinutes = $this->durationMinutesFor($source, $service);
+
+        return [
+            'duration_minutes' => $durationMinutes,
+            'slots' => $this->availableSlotsForDuration($source, $date, $durationMinutes),
+        ];
+    }
+
+    /**
      * @return Collection<int, CarbonImmutable>
      */
     public function availableSlots(
@@ -21,6 +37,18 @@ class BookingAvailabilityService
         CarbonInterface $date,
     ): Collection {
         $durationMinutes = $this->durationMinutesFor($source, $service);
+
+        return $this->availableSlotsForDuration($source, $date, $durationMinutes);
+    }
+
+    /**
+     * @return Collection<int, CarbonImmutable>
+     */
+    private function availableSlotsForDuration(
+        Source $source,
+        CarbonInterface $date,
+        int $durationMinutes,
+    ): Collection {
         $slots = $this->candidateSlotsForDuration($source, $date, $durationMinutes);
 
         if ($slots->isEmpty()) {

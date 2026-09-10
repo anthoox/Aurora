@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AvailabilityController;
 use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\ContactMessageController;
 use App\Http\Controllers\Api\LeadController;
@@ -14,5 +15,7 @@ Route::prefix('v1')->group(function () {
 Route::post('/contact-messages', [ContactMessageController::class, 'store']);
 
 Route::get('/services', [ServiceController::class, 'index']);
+
+Route::get('/availability', AvailabilityController::class);
 
 Route::post('/bookings', [BookingController::class, 'store']);
