@@ -34,4 +34,9 @@ class Source extends Model
     {
         return $this->hasMany(Booking::class);
     }
+
+    public function openingHours(): HasMany
+    {
+        return $this->hasMany(SourceOpeningHour::class);
+    }
 }

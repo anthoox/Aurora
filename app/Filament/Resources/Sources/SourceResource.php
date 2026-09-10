@@ -5,6 +5,8 @@ namespace App\Filament\Resources\Sources;
 use App\Filament\Resources\Sources\Pages\CreateSource;
 use App\Filament\Resources\Sources\Pages\EditSource;
 use App\Filament\Resources\Sources\Pages\ListSources;
+use App\Filament\Resources\Sources\RelationManagers\OpeningHoursRelationManager;
+use App\Filament\Resources\Sources\RelationManagers\ServicesRelationManager;
 use App\Filament\Resources\Sources\Schemas\SourceForm;
 use App\Filament\Resources\Sources\Tables\SourcesTable;
 use App\Models\Source;
@@ -13,8 +15,6 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use App\Filament\Resources\Sources\RelationManagers\ServicesRelationManager;
-
 
 class SourceResource extends Resource
 {
@@ -28,9 +28,11 @@ class SourceResource extends Resource
     {
         return SourceForm::configure($schema);
     }
+
     protected static ?string $navigationLabel = 'Fuentes';
 
     protected static string|\UnitEnum|null $navigationGroup = 'CRM';
+
     public static function table(Table $table): Table
     {
         return SourcesTable::configure($table);
@@ -40,8 +42,10 @@ class SourceResource extends Resource
     {
         return [
             ServicesRelationManager::class,
+            OpeningHoursRelationManager::class,
         ];
     }
+
     public static function canAccess(): bool
     {
         return auth()->user()?->hasRole('admin') ?? false;
@@ -51,6 +55,7 @@ class SourceResource extends Resource
     {
         return auth()->user()?->hasRole('admin') ?? false;
     }
+
     public static function getPages(): array
     {
         return [
