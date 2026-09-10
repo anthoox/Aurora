@@ -31,8 +31,8 @@ class DateOnlyBookingTest extends TestCase
                 'email' => 'ana@example.com',
                 'phone' => '600123123',
                 'service_id' => $service->id,
-                'booking_date' => now()->addDay()->toDateString(),
-                'message' => 'Preferiblemente por la tarde.',
+                'requested_date' => now()->addDay()->toDateString(),
+                'customer_message' => 'Preferiblemente por la tarde.',
             ]);
 
         $response
@@ -71,7 +71,7 @@ class DateOnlyBookingTest extends TestCase
                 'first_name' => 'Ana',
                 'email' => 'ana@example.com',
                 'service_id' => $service->id,
-                'booking_date' => now()->addDay()->toDateString(),
+                'requested_date' => now()->addDay()->toDateString(),
             ])
             ->assertUnprocessable()
             ->assertJsonValidationErrors('service_id');

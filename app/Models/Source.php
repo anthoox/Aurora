@@ -16,6 +16,7 @@ class Source extends Model
             ->withPivot([
                 'description',
                 'price',
+                'duration_minutes',
                 'is_active',
             ])
             ->withTimestamps();
