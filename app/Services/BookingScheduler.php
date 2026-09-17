@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\BookingSlotUnavailableException;
 use App\Models\Booking;
 use App\Models\Customer;
 use App\Models\Service;
@@ -51,9 +52,7 @@ class BookingScheduler
             );
 
             if (! $slotIsAvailable) {
-                throw ValidationException::withMessages([
-                    'booking_time' => 'La hora seleccionada ya no está disponible.',
-                ]);
+                throw BookingSlotUnavailableException::create();
             }
 
             $customer = Customer::firstOrCreate(

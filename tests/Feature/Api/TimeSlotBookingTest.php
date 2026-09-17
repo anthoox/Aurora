@@ -69,6 +69,9 @@ class TimeSlotBookingTest extends TestCase
                 'email' => 'segunda@example.com',
             ])
             ->assertUnprocessable()
+            ->assertJsonPath('message', 'La hora seleccionada ya no está disponible.')
+            ->assertJsonPath('code', 'booking_slot_unavailable')
+            ->assertJsonPath('errors.booking_time.0', 'La hora seleccionada ya no está disponible.')
             ->assertJsonValidationErrors('booking_time');
 
         $this->assertSame(1, Booking::count());
@@ -94,6 +97,20 @@ class TimeSlotBookingTest extends TestCase
             ->postJson('/api/bookings', $payload)
             ->assertUnprocessable()
             ->assertJsonValidationErrors('booking_time');
+    }
+
+    public function test_an_invalid_booking_time_format_does_not_return_the_slot_unavailable_code(): void
+    {
+        [$source, $service] = $this->bookableService();
+
+        $response = $this->withHeader('X-Aurora-Token', $source->api_token)
+            ->postJson('/api/bookings', $this->payload($service, 'invalid-time'));
+
+        $response
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('booking_time');
+
+        $this->assertArrayNotHasKey('code', $response->json());
     }
 
     private function bookableService(): array

@@ -79,6 +79,9 @@ Explica la razón técnica y buenas prácticas aplicadas.
 
 Indica comandos, rutas o pasos para comprobar que funciona.
 
+## 6. Commit
+Dame un commit final con una descripción breve en español de los cambios realiazados
+
 ## Reglas importantes
 
 - Usa Laravel 12 y Filament PHP v4.
