@@ -35,6 +35,7 @@ class ServiceController extends Controller
                     'duration_minutes' => $service->pivot->duration_minutes !== null
                       ? (int) $service->pivot->duration_minutes
                       : null,
+                    'supported_booking_modes' => $service->supportedBookingModes(),
                 ];
             });
 

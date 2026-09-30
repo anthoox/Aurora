@@ -98,6 +98,16 @@ class AvailabilityControllerTest extends TestCase
             ->assertJsonValidationErrors('service_id');
     }
 
+    public function test_it_rejects_a_service_with_zero_duration(): void
+    {
+        [$source, $service] = $this->sourceAndService(durationMinutes: 0);
+
+        $this->withHeader('X-Aurora-Token', $source->api_token)
+            ->getJson("/api/availability?service_id={$service->id}&date=2026-09-14")
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('service_id');
+    }
+
     private function blockingBooking(Source $source, string $startsAt, string $endsAt): Booking
     {
         $customer = Customer::create([

@@ -106,7 +106,7 @@ class BookingAvailabilityService
 
         $durationMinutes = (int) $serviceForSource->pivot->duration_minutes;
 
-        if ($durationMinutes <= 0) {
+        if (! $serviceForSource->hasValidBookingDuration()) {
             throw ValidationException::withMessages([
                 'service_id' => 'El servicio no tiene una duración configurada.',
             ]);

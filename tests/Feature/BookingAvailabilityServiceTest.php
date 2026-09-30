@@ -18,6 +18,20 @@ class BookingAvailabilityServiceTest extends TestCase
 
     private int $customerSequence = 0;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        CarbonImmutable::setTestNow('2026-09-10 08:00:00');
+    }
+
+    protected function tearDown(): void
+    {
+        CarbonImmutable::setTestNow();
+
+        parent::tearDown();
+    }
+
     public function test_it_returns_the_active_weekly_intervals_for_the_requested_day(): void
     {
         $source = $this->source();
