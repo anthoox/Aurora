@@ -43,6 +43,7 @@ class BookingInfolist
                             ->label('Modalidad')
                             ->badge()
                             ->formatStateUsing(fn (string $state): string => match ($state) {
+                                'request_only' => 'Solicitud sin fecha',
                                 'date_only' => 'Solicitud por fecha',
                                 'time_slots' => 'Reserva con horario',
                                 default => $state,

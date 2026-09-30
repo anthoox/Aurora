@@ -24,8 +24,8 @@ class Service extends Model
         }
 
         return $this->hasValidBookingDuration()
-            ? ['date_only', 'time_slots']
-            : ['date_only'];
+            ? ['request_only', 'date_only', 'time_slots']
+            : ['request_only', 'date_only'];
     }
 
     /**

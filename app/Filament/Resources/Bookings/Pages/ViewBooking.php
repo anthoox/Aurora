@@ -24,7 +24,7 @@ class ViewBooking extends ViewRecord
                 ->label('Asignar horario y confirmar')
                 ->icon('heroicon-o-calendar-days')
                 ->color('success')
-                ->visible(fn (): bool => $this->record->booking_mode === 'date_only'
+                ->visible(fn (): bool => in_array($this->record->booking_mode, ['request_only', 'date_only'], true)
                     && $this->record->status === 'pendiente'
                     && ! $this->record->starts_at)
                 ->form([
@@ -85,7 +85,9 @@ class ViewBooking extends ViewRecord
 
                     $serviceName = $this->record->service?->name ?? 'la reserva';
                     $date = $this->record->starts_at?->format('d/m/Y H:i')
-                        ?? $this->record->requested_date?->format('d/m/Y').' (hora pendiente)';
+                        ?? ($this->record->requested_date
+                            ? $this->record->requested_date->format('d/m/Y').' (hora pendiente)'
+                            : 'fecha y hora pendientes de acordar');
 
                     $message = "Hola {$this->record->customer->first_name}, te contacto sobre tu reserva de {$serviceName} del {$date}.";
 
@@ -106,7 +108,9 @@ class ViewBooking extends ViewRecord
                 ->url(function () {
                     $serviceName = $this->record->service?->name ?? 'tu reserva';
                     $date = $this->record->starts_at?->format('d/m/Y H:i')
-                        ?? $this->record->requested_date?->format('d/m/Y').' (hora pendiente)';
+                        ?? ($this->record->requested_date
+                            ? $this->record->requested_date->format('d/m/Y').' (hora pendiente)'
+                            : 'fecha y hora pendientes de acordar');
 
                     $subject = "Reserva de {$serviceName}";
                     $body = "Hola {$this->record->customer->first_name},\n\n"

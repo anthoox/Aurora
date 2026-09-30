@@ -13,6 +13,32 @@ class BookingSchedulingTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_a_request_only_booking_can_be_scheduled_and_confirmed(): void
+    {
+        $booking = $this->dateOnlyBooking();
+        $booking->update(['booking_mode' => 'request_only', 'requested_date' => null]);
+        $startsAt = now()->addDays(2)->setTime(17, 30);
+
+        app(BookingScheduler::class)->scheduleAndConfirm($booking, $startsAt, 45);
+
+        $booking->refresh();
+        $this->assertSame('request_only', $booking->booking_mode);
+        $this->assertSame('confirmada', $booking->status);
+        $this->assertNull($booking->requested_date);
+        $this->assertTrue($booking->starts_at->equalTo($startsAt));
+        $this->assertTrue($booking->ends_at->equalTo($startsAt->copy()->addMinutes(45)));
+    }
+
+    public function test_a_request_only_booking_cannot_be_confirmed_without_a_schedule(): void
+    {
+        $booking = $this->dateOnlyBooking();
+        $booking->update(['booking_mode' => 'request_only', 'requested_date' => null]);
+
+        $this->expectException(ValidationException::class);
+
+        $booking->update(['status' => 'confirmada']);
+    }
+
     public function test_a_date_only_request_can_be_scheduled_and_confirmed(): void
     {
         $booking = $this->dateOnlyBooking();

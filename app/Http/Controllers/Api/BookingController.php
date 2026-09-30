@@ -30,14 +30,14 @@ class BookingController extends Controller
         }
 
         $data = $request->validate([
-            'booking_mode' => ['required', Rule::in(['date_only', 'time_slots'])],
+            'booking_mode' => ['required', Rule::in(['request_only', 'date_only', 'time_slots'])],
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255'],
             'phone' => ['nullable', 'string', 'max:255'],
             'service_id' => ['required', 'integer'],
-            'requested_date' => ['required', 'date_format:Y-m-d', 'after_or_equal:today'],
-            'booking_time' => ['nullable', 'required_if:booking_mode,time_slots', 'date_format:H:i'],
+            'requested_date' => ['exclude_if:booking_mode,request_only', 'required', 'date_format:Y-m-d', 'after_or_equal:today'],
+            'booking_time' => ['exclude_if:booking_mode,request_only', 'nullable', 'required_if:booking_mode,time_slots', 'date_format:H:i'],
             'customer_message' => ['nullable', 'string'],
         ]);
 
@@ -94,8 +94,8 @@ class BookingController extends Controller
                 'customer_id' => $customer->id,
                 'service_id' => $service->id,
                 'source_id' => $source->id,
-                'booking_mode' => 'date_only',
-                'requested_date' => $data['requested_date'],
+                'booking_mode' => $data['booking_mode'],
+                'requested_date' => $data['requested_date'] ?? null,
                 'starts_at' => null,
                 'ends_at' => null,
                 'status' => 'pendiente',
@@ -109,7 +109,7 @@ class BookingController extends Controller
                 'id' => $booking->id,
                 'booking_mode' => $booking->booking_mode,
                 'status' => $booking->status,
-                'requested_date' => $booking->requested_date->toDateString(),
+                'requested_date' => $booking->requested_date?->toDateString(),
                 'starts_at' => null,
                 'ends_at' => null,
                 'service_id' => $booking->service_id,

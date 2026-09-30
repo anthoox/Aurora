@@ -26,7 +26,7 @@ class ServiceControllerTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.0.id', $service->id)
             ->assertJsonPath('data.0.duration_minutes', 30)
-            ->assertJsonPath('data.0.supported_booking_modes', ['date_only', 'time_slots'])
+            ->assertJsonPath('data.0.supported_booking_modes', ['request_only', 'date_only', 'time_slots'])
             ->assertJsonStructure(['data' => [['id', 'name', 'description', 'price', 'duration_minutes', 'supported_booking_modes']]]);
     }
 
@@ -45,7 +45,7 @@ class ServiceControllerTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.0.id', $service->id)
             ->assertJsonPath('data.0.duration_minutes', null)
-            ->assertJsonPath('data.0.supported_booking_modes', ['date_only']);
+            ->assertJsonPath('data.0.supported_booking_modes', ['request_only', 'date_only']);
     }
 
     public function test_booking_modes_use_the_authenticated_sources_pivot(): void
@@ -81,8 +81,8 @@ class ServiceControllerTest extends TestCase
                     'price' => $catalogService->pivot->price,
                     'duration_minutes' => $duration,
                     'supported_booking_modes' => $index === 0
-                        ? ['date_only', 'time_slots']
-                        : ['date_only'],
+                        ? ['request_only', 'date_only', 'time_slots']
+                        : ['request_only', 'date_only'],
                 ]]]);
         }
     }
