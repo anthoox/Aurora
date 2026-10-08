@@ -24,7 +24,7 @@ class BookingAvailabilityService
 
         return [
             'duration_minutes' => $durationMinutes,
-            'slots' => $this->availableSlotsForDuration($source, $date, $durationMinutes),
+            'slots' => $this->availableSlotsForDuration($source, $service, $date, $durationMinutes),
         ];
     }
 
@@ -38,7 +38,7 @@ class BookingAvailabilityService
     ): Collection {
         $durationMinutes = $this->durationMinutesFor($source, $service);
 
-        return $this->availableSlotsForDuration($source, $date, $durationMinutes);
+        return $this->availableSlotsForDuration($source, $service, $date, $durationMinutes);
     }
 
     /**
@@ -46,6 +46,7 @@ class BookingAvailabilityService
      */
     private function availableSlotsForDuration(
         Source $source,
+        Service $service,
         CarbonInterface $date,
         int $durationMinutes,
     ): Collection {
@@ -58,8 +59,16 @@ class BookingAvailabilityService
         $rangeStart = $slots->first();
         $rangeEnd = $slots->last()->addMinutes($durationMinutes);
 
-        $blockingBookings = $source->bookings()
-            ->whereIn('status', Booking::AVAILABILITY_BLOCKING_STATUSES)
+        $blockingBookings = Booking::query()
+            ->where('service_id', $service->getKey())
+            ->where(function ($query): void {
+                $query->where('status', 'confirmada')
+                    ->orWhere(function ($query): void {
+                        $query->where('status', 'pendiente')
+                            ->where('booking_mode', 'time_slots')
+                            ->where('availability_policy', 'blocking');
+                    });
+            })
             ->whereNotNull('starts_at')
             ->whereNotNull('ends_at')
             ->where('starts_at', '<', $rangeEnd)

@@ -17,6 +17,7 @@ class Booking extends Model
         'service_id',
         'source_id',
         'booking_mode',
+        'availability_policy',
         'requested_date',
         'starts_at',
         'ends_at',

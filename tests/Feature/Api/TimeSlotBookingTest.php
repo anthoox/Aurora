@@ -30,7 +30,7 @@ class TimeSlotBookingTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_it_creates_and_confirms_an_available_time_slot_booking(): void
+    public function test_it_creates_a_pending_time_slot_booking(): void
     {
         [$source, $service] = $this->bookableService();
 
@@ -40,7 +40,7 @@ class TimeSlotBookingTest extends TestCase
         $response
             ->assertCreated()
             ->assertJsonPath('data.booking_mode', 'time_slots')
-            ->assertJsonPath('data.status', 'confirmada')
+            ->assertJsonPath('data.status', 'pendiente')
             ->assertJsonPath('data.starts_at', '2026-09-14 09:30:00')
             ->assertJsonPath('data.ends_at', '2026-09-14 10:00:00');
 
@@ -48,7 +48,7 @@ class TimeSlotBookingTest extends TestCase
             'source_id' => $source->id,
             'service_id' => $service->id,
             'booking_mode' => 'time_slots',
-            'status' => 'confirmada',
+            'status' => 'pendiente',
             'starts_at' => '2026-09-14 09:30:00',
             'ends_at' => '2026-09-14 10:00:00',
         ]);

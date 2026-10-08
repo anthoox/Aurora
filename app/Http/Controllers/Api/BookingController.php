@@ -3,14 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Booking;
-use App\Models\Customer;
 use App\Models\Source;
 use App\Services\BookingScheduler;
-use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -29,6 +25,10 @@ class BookingController extends Controller
             ], 401);
         }
 
+        if (is_string($request->input('email'))) {
+            $request->merge(['email' => mb_strtolower(trim($request->input('email')), 'UTF-8')]);
+        }
+
         $data = $request->validate([
             'booking_mode' => ['required', Rule::in(['request_only', 'date_only', 'time_slots'])],
             'first_name' => ['required', 'string', 'max:255'],
@@ -37,7 +37,8 @@ class BookingController extends Controller
             'phone' => ['nullable', 'string', 'max:255'],
             'service_id' => ['required', 'integer'],
             'requested_date' => ['exclude_if:booking_mode,request_only', 'required', 'date_format:Y-m-d', 'after_or_equal:today'],
-            'booking_time' => ['exclude_if:booking_mode,request_only', 'nullable', 'required_if:booking_mode,time_slots', 'date_format:H:i'],
+            'availability_policy' => ['exclude_unless:booking_mode,time_slots', 'sometimes', 'required', Rule::in(['blocking', 'non_blocking'])],
+            'booking_time' => ['exclude_unless:booking_mode,time_slots', 'nullable', 'required_if:booking_mode,time_slots', 'date_format:H:i'],
             'customer_message' => ['nullable', 'string'],
         ]);
 
@@ -52,56 +53,7 @@ class BookingController extends Controller
             ]);
         }
 
-        if ($data['booking_mode'] === 'time_slots') {
-            $startsAt = CarbonImmutable::parse(
-                $data['requested_date'].' '.$data['booking_time'],
-                config('app.timezone'),
-            );
-
-            $booking = $bookingScheduler->createTimeSlotBooking(
-                $source,
-                $service,
-                $startsAt,
-                $data,
-                $data['customer_message'] ?? null,
-            );
-
-            return response()->json([
-                'message' => 'Reserva creada y confirmada correctamente',
-                'data' => [
-                    'id' => $booking->id,
-                    'booking_mode' => $booking->booking_mode,
-                    'status' => $booking->status,
-                    'requested_date' => $booking->requested_date->toDateString(),
-                    'starts_at' => $booking->starts_at->format('Y-m-d H:i:s'),
-                    'ends_at' => $booking->ends_at->format('Y-m-d H:i:s'),
-                    'service_id' => $booking->service_id,
-                ],
-            ], 201);
-        }
-
-        $booking = DB::transaction(function () use ($data, $source, $service): Booking {
-            $customer = Customer::firstOrCreate(
-                ['email' => $data['email']],
-                [
-                    'first_name' => $data['first_name'],
-                    'last_name' => $data['last_name'] ?? null,
-                    'phone' => $data['phone'] ?? null,
-                ],
-            );
-
-            return Booking::create([
-                'customer_id' => $customer->id,
-                'service_id' => $service->id,
-                'source_id' => $source->id,
-                'booking_mode' => $data['booking_mode'],
-                'requested_date' => $data['requested_date'] ?? null,
-                'starts_at' => null,
-                'ends_at' => null,
-                'status' => 'pendiente',
-                'customer_message' => $data['customer_message'] ?? null,
-            ]);
-        });
+        $booking = $bookingScheduler->createRequest($source, $service, $data);
 
         return response()->json([
             'message' => 'Solicitud de reserva recibida correctamente',
@@ -110,8 +62,8 @@ class BookingController extends Controller
                 'booking_mode' => $booking->booking_mode,
                 'status' => $booking->status,
                 'requested_date' => $booking->requested_date?->toDateString(),
-                'starts_at' => null,
-                'ends_at' => null,
+                'starts_at' => $booking->starts_at?->format('Y-m-d H:i:s'),
+                'ends_at' => $booking->ends_at?->format('Y-m-d H:i:s'),
                 'service_id' => $booking->service_id,
             ],
         ], 201);

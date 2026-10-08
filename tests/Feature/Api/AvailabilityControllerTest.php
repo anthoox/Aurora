@@ -118,6 +118,7 @@ class AvailabilityControllerTest extends TestCase
         return Booking::withoutEvents(fn (): Booking => Booking::create([
             'customer_id' => $customer->id,
             'source_id' => $source->id,
+            'service_id' => $source->services()->first()->id,
             'booking_mode' => 'time_slots',
             'requested_date' => '2026-09-14',
             'starts_at' => $startsAt,

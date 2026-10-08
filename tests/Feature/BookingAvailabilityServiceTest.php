@@ -317,7 +317,7 @@ class BookingAvailabilityServiceTest extends TestCase
         }
     }
 
-    public function test_it_removes_slots_overlapping_blocking_bookings_for_the_source(): void
+    public function test_it_removes_slots_overlapping_blocking_bookings_for_the_service(): void
     {
         $source = $this->source();
         $otherSource = $this->source('other');
@@ -404,6 +404,7 @@ class BookingAvailabilityServiceTest extends TestCase
         return Booking::withoutEvents(fn (): Booking => Booking::create([
             'customer_id' => $customer->id,
             'source_id' => $source->id,
+            'service_id' => $source->services()->first()?->id,
             'booking_mode' => $startsAt ? 'time_slots' : 'date_only',
             'requested_date' => '2026-09-14',
             'starts_at' => $startsAt,
