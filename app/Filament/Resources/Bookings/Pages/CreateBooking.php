@@ -2,32 +2,22 @@
 
 namespace App\Filament\Resources\Bookings\Pages;
 
+use App\Filament\Concerns\HandlesBookingValidation;
 use App\Filament\Resources\Bookings\BookingResource;
+use App\Services\BookingScheduler;
 use Filament\Resources\Pages\CreateRecord;
-use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 
 class CreateBooking extends CreateRecord
 {
+    use HandlesBookingValidation;
+
     protected static string $resource = BookingResource::class;
 
-
-    protected function mutateFormDataBeforeCreate(array $data): array
+    protected function handleRecordCreation(array $data): Model
     {
-        $startsAt = Carbon::parse($data['booking_date'] . ' ' . $data['start_time']);
-        
-        if ($startsAt->isPast()) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
-                'start_time' => 'La hora de inicio no puede ser anterior a la hora actual.',
-            ]);
-        }
+        $scheduler = app(BookingScheduler::class);
 
-        $data['starts_at'] = $startsAt;
-        $data['ends_at'] = $startsAt->copy()->addHours((int) $data['duration_hours']);
-        $data['requested_date'] = $data['booking_date'];
-
-        unset($data['booking_date'], $data['start_time'], $data['duration_hours']);
-
-        return $data;
+        return $this->runBookingOperation(fn () => $scheduler->createManual($scheduler->formData($data)));
     }
 }
-

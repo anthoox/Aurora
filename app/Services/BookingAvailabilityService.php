@@ -7,11 +7,40 @@ use App\Models\Service;
 use App\Models\Source;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 
 class BookingAvailabilityService
 {
+    public function assertNoConflict(Booking $booking): void
+    {
+        $conflict = $this->blockingBookings($booking->service_id)
+            ->when($booking->exists, fn ($query) => $query->whereKeyNot($booking->getKey()))
+            ->where('starts_at', '<', $booking->ends_at)
+            ->where('ends_at', '>', $booking->starts_at)
+            ->lockForUpdate()->first();
+
+        if ($conflict) {
+            throw ValidationException::withMessages([
+                'booking' => 'No se puede guardar la reserva: el servicio tiene una reserva confirmada o un bloqueo provisional que se solapa con este horario.',
+            ]);
+        }
+    }
+
+    private function blockingBookings(int $serviceId): Builder
+    {
+        return Booking::query()->where('service_id', $serviceId)
+            ->whereNotNull('starts_at')->whereNotNull('ends_at')
+            ->where(function ($query): void {
+                $query->where('status', 'confirmada')
+                    ->orWhere(function ($query): void {
+                        $query->where('status', 'pendiente')->where('booking_mode', 'time_slots')
+                            ->where('availability_policy', 'blocking');
+                    });
+            });
+    }
+
     /**
      * @return array{duration_minutes: int, slots: Collection<int, CarbonImmutable>}
      */
@@ -59,18 +88,7 @@ class BookingAvailabilityService
         $rangeStart = $slots->first();
         $rangeEnd = $slots->last()->addMinutes($durationMinutes);
 
-        $blockingBookings = Booking::query()
-            ->where('service_id', $service->getKey())
-            ->where(function ($query): void {
-                $query->where('status', 'confirmada')
-                    ->orWhere(function ($query): void {
-                        $query->where('status', 'pendiente')
-                            ->where('booking_mode', 'time_slots')
-                            ->where('availability_policy', 'blocking');
-                    });
-            })
-            ->whereNotNull('starts_at')
-            ->whereNotNull('ends_at')
+        $blockingBookings = $this->blockingBookings($service->getKey())
             ->where('starts_at', '<', $rangeEnd)
             ->where('ends_at', '>', $rangeStart)
             ->get(['starts_at', 'ends_at']);

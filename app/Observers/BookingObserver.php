@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Models\Booking;
 use App\Services\GoogleCalendarService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
@@ -46,7 +47,7 @@ class BookingObserver
             ],
         ]);
 
-        // Timeline del lead, si la reserva viene de una interacción
+        // Timeline del lead, si la reserva viene de una interacciÃ³n
         if ($booking->interaction) {
             $booking->interaction->events()->create([
                 'user_id' => auth()->id(),
@@ -62,22 +63,8 @@ class BookingObserver
             ]);
         }
 
-        // Google Calendar al crear confirmada
         if ($booking->status === 'confirmada') {
-            try {
-                $googleEventId = app(GoogleCalendarService::class)
-                    ->createEventFromBooking($booking);
-
-                $booking->updateQuietly([
-                    'google_event_id' => $googleEventId,
-                    'google_synced_at' => now(),
-                ]);
-            } catch (\Throwable $e) {
-                Log::error('Error al crear evento en Google Calendar', [
-                    'booking_id' => $booking->id,
-                    'message' => $e->getMessage(),
-                ]);
-            }
+            $this->syncAfterCommit($booking);
         }
     }
 
@@ -86,6 +73,15 @@ class BookingObserver
      */
     public function updated(Booking $booking): void
     {
+        foreach (['service_id', 'source_id', 'customer_id', 'availability_policy', 'booking_mode'] as $field) {
+            if ($booking->wasChanged($field)) {
+                $booking->events()->create([
+                    'user_id' => auth()->id(), 'type' => $field.'_changed',
+                    'description' => 'Datos de reserva actualizados: '.$field,
+                    'old_value' => $booking->getOriginal($field), 'new_value' => $booking->{$field},
+                ]);
+            }
+        }
         /*
         |--------------------------------------------------------------------------
         | Timeline propio de la reserva
@@ -184,7 +180,7 @@ class BookingObserver
             $booking->events()->create([
                 'user_id' => auth()->id(),
                 'type' => 'participants_changed',
-                'description' => 'Número de participantes actualizado',
+                'description' => 'NÃºmero de participantes actualizado',
                 'old_value' => $booking->getOriginal('participants_count'),
                 'new_value' => $booking->participants_count,
             ]);
@@ -206,7 +202,7 @@ class BookingObserver
 
         /*
         |--------------------------------------------------------------------------
-        | Automatización comercial
+        | AutomatizaciÃ³n comercial
         |--------------------------------------------------------------------------
         */
 
@@ -222,68 +218,53 @@ class BookingObserver
         |--------------------------------------------------------------------------
         */
 
-        if ($booking->wasChanged('status') && $booking->status === 'confirmada' && ! $booking->google_event_id) {
-            try {
-                $googleEventId = app(GoogleCalendarService::class)
-                    ->createEventFromBooking($booking);
-
-                $booking->updateQuietly([
-                    'google_event_id' => $googleEventId,
-                    'google_synced_at' => now(),
-                ]);
-            } catch (\Throwable $e) {
-                Log::error('Error al crear evento en Google Calendar al confirmar reserva', [
-                    'booking_id' => $booking->id,
-                    'message' => $e->getMessage(),
-                ]);
-            }
+        if ($booking->wasChanged([
+            'status', 'starts_at', 'ends_at', 'notes', 'service_id', 'customer_id',
+            'source_id', 'participants_count', 'language', 'level',
+        ]) && ($booking->status === 'confirmada' || $booking->google_event_id)) {
+            $this->syncAfterCommit($booking);
         }
+    }
 
-        if ($booking->wasChanged('status') && $booking->status === 'cancelada' && $booking->google_event_id) {
+    private function syncAfterCommit(Booking $booking): void
+    {
+        $id = $booking->getKey();
+        DB::afterCommit(function () use ($id): void {
             try {
-                app(GoogleCalendarService::class)
-                    ->deleteEvent($booking->google_event_id);
-
-                $booking->updateQuietly([
-                    'google_event_id' => null,
-                    'google_synced_at' => now(),
-                ]);
+                // Serialize synchronization per booking and reload the committed state.
+                DB::transaction(function () use ($id): void {
+                    $current = Booking::query()->whereKey($id)->lockForUpdate()->first();
+                    if (! $current) {
+                        return;
+                    }
+                    if ($current->status === 'confirmada') {
+                        $calendar = app(GoogleCalendarService::class);
+                        if ($current->google_event_id) {
+                            $calendar->updateEventFromBooking($current);
+                        } else {
+                            $current->google_event_id = $calendar->createEventFromBooking($current);
+                        }
+                        $current->google_synced_at = now();
+                        $current->saveQuietly();
+                    } elseif (in_array($current->status, ['cancelada', 'pendiente'], true) && $current->google_event_id) {
+                        app(GoogleCalendarService::class)->deleteEvent($current->google_event_id);
+                        $current->updateQuietly(['google_event_id' => null, 'google_synced_at' => now()]);
+                    }
+                });
             } catch (\Throwable $e) {
-                Log::error('Error al eliminar evento en Google Calendar al cancelar reserva', [
-                    'booking_id' => $booking->id,
-                    'message' => $e->getMessage(),
+                Log::error('Error al sincronizar reserva con Google Calendar después del commit', [
+                    'booking_id' => $id, 'message' => $e->getMessage(),
                 ]);
             }
-        }
+        });
+    }
 
-        if (
-            $booking->google_event_id &&
-            $booking->status === 'confirmada' &&
-            $booking->wasChanged([
-                'starts_at',
-                'ends_at',
-                'notes',
-                'service_id',
-                'customer_id',
-                'source_id',
-                'participants_count',
-                'language',
-                'level',
-            ])
-        ) {
-            try {
-                app(GoogleCalendarService::class)
-                    ->updateEventFromBooking($booking);
-
-                $booking->updateQuietly([
-                    'google_synced_at' => now(),
-                ]);
-            } catch (\Throwable $e) {
-                Log::error('Error al actualizar evento en Google Calendar', [
-                    'booking_id' => $booking->id,
-                    'message' => $e->getMessage(),
-                ]);
-            }
+    public function deleting(Booking $booking): void
+    {
+        if (Booking::query()->whereKey($booking->getKey())->value('google_event_id')) {
+            throw ValidationException::withMessages([
+                'booking' => 'Cancela primero la reserva y espera a que se elimine su evento de Google Calendar.',
+            ]);
         }
     }
 

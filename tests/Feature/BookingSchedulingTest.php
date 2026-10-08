@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\Booking;
 use App\Models\Customer;
+use App\Models\Service;
+use App\Models\Source;
 use App\Services\BookingScheduler;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
@@ -84,7 +86,12 @@ class BookingSchedulingTest extends TestCase
             'email' => 'ana@example.com',
         ]);
 
+        $source = Source::create(['name' => 'Web', 'slug' => 'web', 'api_token' => 'token', 'is_active' => true]);
+        $service = Service::create(['name' => 'Servicio']);
+        $source->services()->attach($service, ['is_active' => true, 'duration_minutes' => 30]);
+
         return Booking::create([
+            'source_id' => $source->id, 'service_id' => $service->id,
             'customer_id' => $customer->id,
             'booking_mode' => 'date_only',
             'requested_date' => now()->addDay()->toDateString(),

@@ -6,12 +6,18 @@ use App\Models\Booking;
 use App\Models\Customer;
 use App\Models\Service;
 use App\Models\Source;
+use App\Services\BookingScheduler;
+use App\Services\GoogleCalendarService;
+use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 require dirname(__DIR__, 2).'/vendor/autoload.php';
 $app = require dirname(__DIR__, 2).'/bootstrap/app.php';
-$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+$app->make(Kernel::class)->bootstrap();
 $worker = ($argv[1] ?? '') === 'worker';
 $database = $worker ? $argv[2] : 'aurora_concurrency_test_'.date('Ymd_His').'_'.bin2hex(random_bytes(3));
 if (! preg_match('/^aurora_concurrency_test_[a-zA-Z0-9_]+$/', $database)) {
@@ -38,6 +44,12 @@ if ($worker) {
     [$script, $mode, $dbName, $directory, $index] = $argv;
     $input = json_decode(file_get_contents($directory.'/input.json'), true, flags: JSON_THROW_ON_ERROR);
     config(['bookings.source_availability_policies' => $input['policies']]);
+    // Exercise callbacks without contacting a real Google Calendar.
+    $calendar = Mockery::mock(GoogleCalendarService::class);
+    $calendar->shouldReceive('createEventFromBooking')->andReturnUsing(fn ($booking) => 'test-event-'.$booking->id);
+    $calendar->shouldReceive('updateEventFromBooking')->andReturnNull();
+    $calendar->shouldReceive('deleteEvent')->andReturnNull();
+    $app->instance(GoogleCalendarService::class, $calendar);
     $connectionId = DB::selectOne('SELECT CONNECTION_ID() id')->id;
     $lockTimes = [];
     $customerBarrierUsed = false;
@@ -56,9 +68,26 @@ if ($worker) {
     touch($directory.'/ready-'.$index);
     $wait($directory.'/go');
     $payload = $input['requests'][$index];
+    if (($payload['operation'] ?? null) === 'confirm') {
+        if ($input['delay_confirm'] ?? false) {
+            usleep(200000);
+        }
+        try {
+            $booking = app(BookingScheduler::class)->confirm(Booking::findOrFail($payload['booking_id']));
+            $response = new JsonResponse(['data' => ['id' => $booking->id, 'status' => $booking->status]], 201);
+        } catch (ValidationException $exception) {
+            $response = new JsonResponse(['errors' => $exception->errors()], 422);
+        }
+        file_put_contents($directory.'/result-'.$index.'.json', json_encode([
+            'connection_id' => $connectionId, 'operation' => 'confirm-service',
+            'http' => $response->getStatusCode(), 'body' => $response->getData(true),
+            'service_lock_ms' => $lockTimes,
+        ], JSON_PRETTY_PRINT));
+        exit;
+    }
     $token = $payload['token'];
     unset($payload['token']);
-    $request = Illuminate\Http\Request::create('/api/bookings', 'POST', [], [], [], [
+    $request = Request::create('/api/bookings', 'POST', [], [], [], [
         'CONTENT_TYPE' => 'application/json', 'HTTP_ACCEPT' => 'application/json',
         'HTTP_X_AURORA_TOKEN' => $token,
     ], json_encode($payload));
@@ -85,7 +114,10 @@ $root = sys_get_temp_dir().'/'.$database;
 mkdir($root);
 $report = ['database' => $database, 'server' => $metadata, 'engines' => $engines, 'runs' => []];
 $failures = 0;
-foreach (['duplicate', 'blocking', 'new_customer', 'non_blocking'] as $scenario) {
+$scenarios = ($argv[1] ?? '') === '--phase3'
+    ? ['confirm_confirm', 'confirm_create']
+    : ['duplicate', 'blocking', 'new_customer', 'non_blocking', 'confirm_confirm', 'confirm_create'];
+foreach ($scenarios as $scenario) {
     for ($round = 0; $round < 5; $round++) {
         $directory = $root.'/'.$scenario.'-'.$round;
         mkdir($directory);
@@ -103,13 +135,31 @@ foreach (['duplicate', 'blocking', 'new_customer', 'non_blocking'] as $scenario)
         $requests = [];
         foreach ($sources as $index => $source) {
             $requests[] = ['token' => $source->api_token, 'first_name' => 'Test',
-                'email' => $scenario.'-'.$round.($scenario === 'blocking' || $scenario === 'non_blocking' ? '-'.$index : '').'@example.test',
+                'email' => $scenario.'-'.$round.(in_array($scenario, ['blocking', 'non_blocking', 'confirm_confirm', 'confirm_create']) ? '-'.$index : '').'@example.test',
                 'service_id' => $index === 0 ? $service->id : $secondService->id,
                 'booking_mode' => 'time_slots', 'requested_date' => $date, 'booking_time' => '09:00',
                 'availability_policy' => $scenario === 'non_blocking' ? 'non_blocking' : 'blocking'];
         }
+        if (in_array($scenario, ['confirm_confirm', 'confirm_create'])) {
+            foreach ($requests as $index => &$payload) {
+                if ($index === 1 && $scenario === 'confirm_create') {
+                    continue;
+                }
+                $customer = Customer::create(['first_name' => 'Test', 'email' => $payload['email']]);
+                $booking = Booking::withoutEvents(fn () => Booking::create([
+                    'customer_id' => $customer->id, 'source_id' => $sources[$index]->id,
+                    'service_id' => $service->id, 'booking_mode' => 'time_slots', 'status' => 'pendiente',
+                    'availability_policy' => 'non_blocking', 'requested_date' => $date,
+                    'starts_at' => $date.' 09:00:00', 'ends_at' => $date.' 09:30:00',
+                ]));
+                $payload['operation'] = 'confirm';
+                $payload['booking_id'] = $booking->id;
+            }
+            unset($payload);
+        }
         file_put_contents($directory.'/input.json', json_encode(['requests' => $requests,
             'customer_barrier' => $scenario === 'new_customer',
+            'delay_confirm' => $scenario === 'confirm_create' && $round % 2 === 1,
             'policies' => array_fill_keys(array_map(fn ($source) => $source->id, $sources), ['blocking', 'non_blocking'])]));
         $processes = [];
         for ($index = 0; $index < 2; $index++) {
@@ -130,7 +180,7 @@ foreach (['duplicate', 'blocking', 'new_customer', 'non_blocking'] as $scenario)
         }
         $statuses = array_column($results, 'http');
         sort($statuses);
-        $expected = in_array($scenario, ['duplicate', 'blocking']) ? [201, 422] : [201, 201];
+        $expected = in_array($scenario, ['duplicate', 'blocking', 'confirm_confirm', 'confirm_create']) ? [201, 422] : [201, 201];
         $bookingCount = Booking::whereIn('service_id', [$service->id, $secondService->id])->count();
         $customerCount = Customer::whereIn('email', array_column($requests, 'email'))->count();
         $codes = array_map(fn ($result) => $result['body']['code'] ?? null, $results);
@@ -139,6 +189,19 @@ foreach (['duplicate', 'blocking', 'new_customer', 'non_blocking'] as $scenario)
             && ($scenario !== 'duplicate' || in_array('booking_already_exists', $codes))
             && ($scenario !== 'blocking' || in_array('booking_slot_unavailable', $codes))
             && ($results[0]['connection_id'] ?? null) !== ($results[1]['connection_id'] ?? null);
+        if (in_array($scenario, ['confirm_confirm', 'confirm_create'])) {
+            $confirmed = Booking::where('service_id', $service->id)->where('status', 'confirmada')->count();
+            $provisional = Booking::where('service_id', $service->id)->where('status', 'pendiente')->where('availability_policy', 'blocking')->count();
+            $pass = $statuses === [201, 422] && $confirmed + $provisional === 1
+                && $results[0]['connection_id'] !== $results[1]['connection_id'];
+            if ($scenario === 'confirm_confirm') {
+                $pass = $pass && $bookingCount === 2 && $customerCount === 2
+                    && Booking::where('service_id', $service->id)->where('status', 'pendiente')->count() === 1;
+            } else {
+                $pass = $pass && $bookingCount === ($confirmed ? 1 : 2)
+                    && $customerCount === $bookingCount;
+            }
+        }
         $entry = compact('scenario', 'round', 'pass', 'bookingCount', 'customerCount', 'results');
         $report['runs'][] = $entry;
         echo json_encode($entry, JSON_UNESCAPED_UNICODE).PHP_EOL;

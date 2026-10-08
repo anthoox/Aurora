@@ -6,6 +6,8 @@ use App\Models\Service;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\TimePicker;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
@@ -29,7 +31,7 @@ class BookingForm
                             ->relationship('interaction', 'id')
                             ->searchable()
                             ->preload()
-                            ->visible(fn($record) => filled($record?->interaction_id))
+                            ->visible(fn ($record) => filled($record?->interaction_id))
                             ->disabled()
                             ->dehydrated(),
 
@@ -40,14 +42,14 @@ class BookingForm
                             ->preload()
                             ->required()
                             ->live()
-                            ->afterStateUpdated(fn($set) => $set('service_id', null)),
+                            ->afterStateUpdated(fn ($set) => $set('service_id', null)),
 
                         Select::make('service_id')
                             ->label('Servicio')
                             ->options(function ($get) {
                                 $sourceId = $get('source_id');
 
-                                if (!$sourceId) {
+                                if (! $sourceId) {
                                     return [];
                                 }
 
@@ -62,7 +64,7 @@ class BookingForm
                             ->searchable()
                             ->preload()
                             ->placeholder('Selecciona primero un origen')
-                            ->required(),
+                            ->required(fn ($record) => ! $record),
                         Select::make('participants_count')
                             ->label('Participantes')
                             ->options([
@@ -85,10 +87,10 @@ class BookingForm
                         Select::make('language')
                             ->label('Idioma')
                             ->options([
-                                'es' => 'Español',
-                                'en' => 'Inglés',
-                                'fr' => 'Francés',
-                                'de' => 'Alemán',
+                                'es' => 'EspaÃ±ol',
+                                'en' => 'InglÃ©s',
+                                'fr' => 'FrancÃ©s',
+                                'de' => 'AlemÃ¡n',
                                 'it' => 'Italiano',
                             ])
                             ->searchable(),
@@ -103,7 +105,7 @@ class BookingForm
                             ])
                             ->searchable(),
                     ])
-                    
+
                     ->columns(2),
 
                 Section::make('Fecha y estado')
@@ -111,8 +113,7 @@ class BookingForm
                         DatePicker::make('booking_date')
                             ->label('Fecha')
                             ->native(false)
-                            ->minDate(today())
-                            ->required()
+                            ->minDate(fn ($record) => $record ? null : today())
                             ->afterStateHydrated(function ($component, $record) {
                                 if ($record?->starts_at || $record?->requested_date) {
                                     $component->state(
@@ -121,74 +122,20 @@ class BookingForm
                                 }
                             }),
 
-                        Select::make('start_time')
+                        TimePicker::make('start_time')
                             ->label('Hora inicio')
-                            ->options([
-                                '09:00' => '09:00',
-                                '09:30' => '09:30',
-                                '10:00' => '10:00',
-                                '10:30' => '10:30',
-                                '11:00' => '11:00',
-                                '11:30' => '11:30',
-                                '12:00' => '12:00',
-                                '12:30' => '12:30',
-                                '13:00' => '13:00',
-                                '13:30' => '13:30',
-                                '14:00' => '14:00',
-                                '14:30' => '14:30',
-                                '15:00' => '15:00',
-                                '15:30' => '15:30',
-                                '16:00' => '16:00',
-                                '16:30' => '16:30',
-                                '17:00' => '17:00',
-                                '17:30' => '17:30',
-                                '18:00' => '18:00',
-                                '18:30' => '18:30',
-                                '19:00' => '19:00',
-                                '19:30' => '19:30',
-                                '20:00' => '20:00',
-                            ])
-                            ->searchable()
-                            ->required()
-                            ->rule(function ($get) {
-                                return function (string $attribute, $value, \Closure $fail) use ($get) {
-                                    $date = $get('booking_date');
-
-                                    if (!$date || !$value) {
-                                        return;
-                                    }
-
-                                    $startsAt = \Carbon\Carbon::parse($date . ' ' . $value);
-
-                                    if ($startsAt->isPast()) {
-                                        $fail('La hora de inicio no puede ser anterior a la hora actual.');
-                                    }
-                                };
-                            })
+                            ->seconds(false)
                             ->afterStateHydrated(function ($component, $record) {
-                                if ($record?->starts_at) {
-                                    $component->state(
-                                        $record->starts_at->format('H:i')
-                                    );
-                                }
+                                $component->state($record?->starts_at?->format('H:i'));
                             }),
 
-                        Select::make('duration_hours')
-                            ->label('Duración')
-                            ->options([
-                                1 => '1 hora',
-                                2 => '2 horas',
-                                3 => '3 horas',
-                                4 => '4 horas',
-                                5 => '5 horas',
-                            ])
-                            ->default(1)
-                            ->required()
+                        TextInput::make('duration_minutes')
+                            ->label('Duración en minutos')
+                            ->numeric()->integer()->minValue(1)
+                            ->default(60)
                             ->afterStateHydrated(function ($component, $record) {
                                 if ($record?->starts_at && $record?->ends_at) {
-                                    $component->state(
-                                        $record->starts_at->diffInHours($record->ends_at)
-                                    );
+                                    $component->state((int) $record->starts_at->diffInMinutes($record->ends_at));
                                 }
                             }),
 

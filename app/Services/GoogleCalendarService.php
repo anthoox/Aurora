@@ -10,78 +10,78 @@ use Google\Service\Calendar\EventDateTime;
 
 class GoogleCalendarService
 {
-  private Calendar $calendar;
+    private Calendar $calendar;
 
-  private string $calendarId;
+    private string $calendarId;
 
-  public function __construct()
-  {
-    $client = new Client();
+    public function __construct()
+    {
+        $client = new Client;
 
-    $credentialsPath = base_path(config('services.google_calendar.credentials_path'));
+        $credentialsPath = base_path(config('services.google_calendar.credentials_path'));
 
-    if (!file_exists($credentialsPath)) {
-      dd('No existe el archivo: ' . $credentialsPath);
+        if (! file_exists($credentialsPath)) {
+            throw new \RuntimeException('No se encuentran las credenciales de Google Calendar.');
+        }
+
+        $client->setAuthConfig($credentialsPath);
+        $client->addScope(Calendar::CALENDAR);
+
+        $this->calendar = new Calendar($client);
+        $this->calendarId = config('services.google_calendar.calendar_id');
+
     }
 
-    $client->setAuthConfig($credentialsPath);
-    $client->addScope(Calendar::CALENDAR);
+    public function createEventFromBooking(Booking $booking): string
+    {
+        $event = new Event([
+            'summary' => $this->buildSummary($booking),
+            'description' => $this->buildDescription($booking),
+            'start' => new EventDateTime([
+                'dateTime' => $booking->starts_at->toRfc3339String(),
+                'timeZone' => config('app.timezone'),
+            ]),
+            'end' => new EventDateTime([
+                'dateTime' => ($booking->ends_at ?? $booking->starts_at->copy()->addHour())->toRfc3339String(),
+                'timeZone' => config('app.timezone'),
+            ]),
+        ]);
 
-    $this->calendar = new Calendar($client);
-    $this->calendarId = config('services.google_calendar.calendar_id');
-    
-  }
+        $createdEvent = $this->calendar->events->insert(
+            $this->calendarId,
+            $event
+        );
 
-  public function createEventFromBooking(Booking $booking): string
-  {
-    $event = new Event([
-      'summary' => $this->buildSummary($booking),
-      'description' => $this->buildDescription($booking),
-      'start' => new EventDateTime([
-        'dateTime' => $booking->starts_at->toRfc3339String(),
-        'timeZone' => config('app.timezone'),
-      ]),
-      'end' => new EventDateTime([
-        'dateTime' => ($booking->ends_at ?? $booking->starts_at->copy()->addHour())->toRfc3339String(),
-        'timeZone' => config('app.timezone'),
-      ]),
-    ]);
+        return $createdEvent->getId();
+    }
 
-    $createdEvent = $this->calendar->events->insert(
-      $this->calendarId,
-      $event
-    );
+    private function buildSummary(Booking $booking): string
+    {
+        $serviceName = $booking->service?->name ?? 'Reserva';
 
-    return $createdEvent->getId();
-  }
+        return "{$serviceName} - {$booking->customer->first_name}";
+    }
 
-  private function buildSummary(Booking $booking): string
-  {
-    $serviceName = $booking->service?->name ?? 'Reserva';
+    private function buildDescription(Booking $booking): string
+    {
+        $language = match ($booking->language) {
+            'es' => 'EspaÃ±ol',
+            'en' => 'InglÃ©s',
+            'fr' => 'FrancÃ©s',
+            'de' => 'AlemÃ¡n',
+            'it' => 'Italiano',
+            default => 'No especificado',
+        };
 
-    return "{$serviceName} - {$booking->customer->first_name}";
-  }
+        $level = match ($booking->level) {
+            'beginner' => 'Principiante',
+            'intermediate' => 'Intermedio',
+            'advanced' => 'Avanzado',
+            'professional' => 'Profesional',
+            default => 'No especificado',
+        };
 
-  private function buildDescription(Booking $booking): string
-  {
-    $language = match ($booking->language) {
-      'es' => 'Español',
-      'en' => 'Inglés',
-      'fr' => 'Francés',
-      'de' => 'Alemán',
-      'it' => 'Italiano',
-      default => 'No especificado',
-    };
-
-    $level = match ($booking->level) {
-      'beginner' => 'Principiante',
-      'intermediate' => 'Intermedio',
-      'advanced' => 'Avanzado',
-      'professional' => 'Profesional',
-      default => 'No especificado',
-    };
-
-    return trim("
+        return trim("
 Reserva creada desde Aurora CRM.
 
 Cliente:
@@ -89,7 +89,7 @@ Cliente:
 
 Contacto:
 Email: {$booking->customer?->email}
-Teléfono: {$booking->customer?->phone}
+TelÃ©fono: {$booking->customer?->phone}
 
 Reserva:
 Origen: {$booking->source?->name}
@@ -105,43 +105,40 @@ Fin: {$booking->ends_at?->format('d/m/Y H:i')}
 Notas:
 {$booking->notes}
     ");
-  }
-
-  public function deleteEvent(string $eventId): void
-  {
-    $this->calendar->events->delete(
-      $this->calendarId,
-      $eventId
-    );
-  }
-
-  public function updateEventFromBooking(Booking $booking): void
-  {
-    if (!$booking->google_event_id) {
-      return;
     }
 
-    $event = new Event([
-      'summary' => $this->buildSummary($booking),
-      'description' => $this->buildDescription($booking),
-      'start' => new EventDateTime([
-        'dateTime' => $booking->starts_at->toRfc3339String(),
-        'timeZone' => config('app.timezone'),
-      ]),
-      'end' => new EventDateTime([
-        'dateTime' => ($booking->ends_at ?? $booking->starts_at->copy()->addHour())->toRfc3339String(),
-        'timeZone' => config('app.timezone'),
-      ]),
-    ]);
+    public function deleteEvent(string $eventId): void
+    {
+        $this->calendar->events->delete(
+            $this->calendarId,
+            $eventId
+        );
+    }
 
-    $this->calendar->events->update(
-      $this->calendarId,
-      $booking->google_event_id,
-      $event
-    );
+    public function updateEventFromBooking(Booking $booking): void
+    {
+        if (! $booking->google_event_id) {
+            return;
+        }
 
-    
-  }
+        $event = new Event([
+            'summary' => $this->buildSummary($booking),
+            'description' => $this->buildDescription($booking),
+            'start' => new EventDateTime([
+                'dateTime' => $booking->starts_at->toRfc3339String(),
+                'timeZone' => config('app.timezone'),
+            ]),
+            'end' => new EventDateTime([
+                'dateTime' => ($booking->ends_at ?? $booking->starts_at->copy()->addHour())->toRfc3339String(),
+                'timeZone' => config('app.timezone'),
+            ]),
+        ]);
 
-  
+        $this->calendar->events->update(
+            $this->calendarId,
+            $booking->google_event_id,
+            $event
+        );
+
+    }
 }

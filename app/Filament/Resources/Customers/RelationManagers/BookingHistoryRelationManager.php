@@ -4,12 +4,14 @@ namespace App\Filament\Resources\Customers\RelationManagers;
 
 use App\Filament\Resources\Bookings\BookingResource;
 use App\Filament\Resources\Customers\Pages\ViewCustomer;
+use App\Services\BookingScheduler;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class BookingHistoryRelationManager extends RelationManager
 {
@@ -21,7 +23,7 @@ class BookingHistoryRelationManager extends RelationManager
     {
         return $table
             ->modifyQueryUsing(
-                fn(Builder $query) => $query
+                fn (Builder $query) => $query
                     ->where(function (Builder $query) {
                         $query
                             ->where('starts_at', '<', now())
@@ -32,17 +34,17 @@ class BookingHistoryRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('id')
                     ->label('Reserva')
-                    ->formatStateUsing(fn($state) => 'RES-' . $state),
+                    ->formatStateUsing(fn ($state) => 'RES-'.$state),
                 TextColumn::make('booking_origin')
                     ->label('Origen reserva')
                     ->state(
-                        fn($record): string => $record->interaction_id
-                        ? 'Lead INT-' . $record->interaction_id
+                        fn ($record): string => $record->interaction_id
+                        ? 'Lead INT-'.$record->interaction_id
                         : 'Manual'
                     )
                     ->badge()
                     ->color(
-                        fn(string $state): string => str_starts_with($state, 'Lead')
+                        fn (string $state): string => str_starts_with($state, 'Lead')
                         ? 'info'
                         : 'gray'
                     ),
@@ -52,10 +54,10 @@ class BookingHistoryRelationManager extends RelationManager
                     ->sortable(),
 
                 TextColumn::make('duration')
-                    ->label('Duración')
+                    ->label('DuraciÃƒÂ³n')
                     ->state(function ($record): string {
-                        if (!$record->starts_at || !$record->ends_at) {
-                            return 'Sin duración';
+                        if (! $record->starts_at || ! $record->ends_at) {
+                            return 'Sin duraciÃƒÂ³n';
                         }
 
                         $hours = $record->starts_at->diffInHours($record->ends_at);
@@ -79,7 +81,7 @@ class BookingHistoryRelationManager extends RelationManager
                 TextColumn::make('status')
                     ->label('Estado')
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'realizada' => 'info',
                         'cancelada' => 'danger',
                         'confirmada' => 'success',
@@ -89,18 +91,22 @@ class BookingHistoryRelationManager extends RelationManager
             ])
             ->recordActions([
                 ViewAction::make()
-                    ->url(fn($record) => BookingResource::getUrl('view', [
+                    ->url(fn ($record) => BookingResource::getUrl('view', [
                         'record' => $record,
                     ])),
 
                 EditAction::make()
-                    ->disabled(fn($record) => !$record->canBeEdited())
+                    ->using(function (Model $record, array $data): Model {
+                        return app(BookingScheduler::class)->updateManual($record, $data);
+                    })
+                    ->url(fn ($record) => BookingResource::getUrl('edit', ['record' => $record]))
+                    ->disabled(fn ($record) => ! $record->canBeEdited())
                     ->tooltip(
-                        fn($record) => $record->canBeEdited()
+                        fn ($record) => $record->canBeEdited()
                         ? 'Editar reserva'
                         : 'Esta reserva no se puede editar por su estado o porque ya ha empezado'
                     )
-                    ->color(fn($record) => $record->canBeEdited() ? 'primary' : 'gray'),
+                    ->color(fn ($record) => $record->canBeEdited() ? 'primary' : 'gray'),
             ]);
     }
 

@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Booking;
+use App\Services\BookingScheduler;
 use Illuminate\Console\Command;
 
 class CompleteFinishedBookings extends Command
@@ -19,13 +20,12 @@ class CompleteFinishedBookings extends Command
             ->where('ends_at', '<=', now())
             ->get();
 
+        $completed = 0;
         foreach ($bookings as $booking) {
-            $booking->update([
-                'status' => 'realizada',
-            ]);
+            $completed += (int) app(BookingScheduler::class)->completeIfFinished($booking);
         }
 
-        $this->info("Reservas actualizadas: {$bookings->count()}");
+        $this->info("Reservas actualizadas: {$completed}");
 
         return self::SUCCESS;
     }

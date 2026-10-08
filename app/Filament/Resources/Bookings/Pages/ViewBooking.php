@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Bookings\Pages;
 
+use App\Filament\Concerns\HandlesBookingValidation;
 use App\Filament\Resources\Bookings\BookingResource;
 use App\Services\BookingScheduler;
 use Carbon\Carbon;
@@ -15,11 +16,26 @@ use Filament\Resources\Pages\ViewRecord;
 
 class ViewBooking extends ViewRecord
 {
+    use HandlesBookingValidation;
+
     protected static string $resource = BookingResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('confirmRequest')
+                ->label('Confirmar solicitud')
+                ->icon('heroicon-o-check-circle')
+                ->color('success')
+                ->requiresConfirmation()
+                ->visible(fn (): bool => $this->record->booking_mode === 'time_slots'
+                    && $this->record->status === 'pendiente'
+                    && $this->record->starts_at && $this->record->ends_at)
+                ->action(function (): void {
+                    $this->runBookingOperation(fn () => app(BookingScheduler::class)->confirm($this->record));
+                    Notification::make()->title('Solicitud confirmada')->success()->send();
+                    $this->redirect(BookingResource::getUrl('view', ['record' => $this->record]));
+                }),
             Action::make('scheduleAndConfirm')
                 ->label('Asignar horario y confirmar')
                 ->icon('heroicon-o-calendar-days')
@@ -42,7 +58,7 @@ class ViewBooking extends ViewRecord
                         ->required(),
 
                     Select::make('duration_minutes')
-                        ->label('Duración')
+                        ->label('DuraciÃƒÂ³n')
                         ->options([
                             30 => '30 minutos',
                             45 => '45 minutos',
@@ -56,11 +72,11 @@ class ViewBooking extends ViewRecord
                 ->action(function (array $data): void {
                     $startsAt = Carbon::parse($data['booking_date'].' '.$data['start_time']);
 
-                    app(BookingScheduler::class)->scheduleAndConfirm(
+                    $this->runBookingOperation(fn () => app(BookingScheduler::class)->scheduleAndConfirm(
                         $this->record,
                         $startsAt,
                         (int) $data['duration_minutes'],
-                    );
+                    ));
 
                     Notification::make()
                         ->title('Horario asignado y reserva confirmada')
@@ -77,7 +93,7 @@ class ViewBooking extends ViewRecord
                 ->disabled(fn () => blank($this->record->customer->phone))
                 ->tooltip(
                     fn () => blank($this->record->customer->phone)
-                    ? 'Este cliente no tiene teléfono registrado'
+                    ? 'Este cliente no tiene telÃƒÂ©fono registrado'
                     : 'Contactar por WhatsApp'
                 )
                 ->url(function () {
