@@ -24,6 +24,7 @@ class Booking extends Model
         'status',
         'notes',
         'customer_message',
+        'custom_fields',
         'google_event_id',
         'google_synced_at',
         'participants_count',
@@ -32,6 +33,7 @@ class Booking extends Model
     ];
 
     protected $casts = [
+        'custom_fields' => 'array',
         'requested_date' => 'date',
         'starts_at' => 'datetime',
         'ends_at' => 'datetime',

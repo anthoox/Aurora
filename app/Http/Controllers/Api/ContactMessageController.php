@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ContactMessage;
 use App\Models\Customer;
 use App\Models\Source;
+use App\Rules\CustomFields;
 use Illuminate\Http\Request;
 
 class ContactMessageController extends Controller
@@ -22,6 +23,7 @@ class ContactMessageController extends Controller
             'email' => ['required', 'email', 'max:255'],
             'phone' => ['nullable', 'string', 'max:255'],
             'message' => ['required', 'string'],
+            ...CustomFields::rules(),
         ]);
 
         $customer = Customer::firstOrCreate(
@@ -41,6 +43,7 @@ class ContactMessageController extends Controller
             'email' => $data['email'],
             'phone' => $data['phone'] ?? null,
             'message' => $data['message'],
+            'custom_fields' => $data['custom_fields'] ?? null,
             'status' => 'nuevo',
         ]);
 

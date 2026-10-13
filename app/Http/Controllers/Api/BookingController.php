@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Source;
+use App\Rules\CustomFields;
 use App\Services\BookingScheduler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -40,6 +41,7 @@ class BookingController extends Controller
             'availability_policy' => ['exclude_unless:booking_mode,time_slots', 'sometimes', 'required', Rule::in(['blocking', 'non_blocking'])],
             'booking_time' => ['exclude_unless:booking_mode,time_slots', 'nullable', 'required_if:booking_mode,time_slots', 'date_format:H:i'],
             'customer_message' => ['nullable', 'string'],
+            ...CustomFields::rules(),
         ]);
 
         $service = $source->services()

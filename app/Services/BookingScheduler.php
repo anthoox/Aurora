@@ -127,6 +127,7 @@ class BookingScheduler
                 'ends_at' => $endsAt,
                 'status' => 'pendiente',
                 'customer_message' => $data['customer_message'] ?? null,
+                'custom_fields' => $data['custom_fields'] ?? null,
             ]);
         }, 3);
     }

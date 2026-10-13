@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Bookings\Schemas;
 
+use App\Models\Booking;
+use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -160,6 +162,23 @@ class BookingInfolist
                             ->label('')
                             ->placeholder('Sin mensaje del cliente')
                             ->columnSpanFull(),
+                    ]),
+
+                Section::make('Campos del formulario')
+                    ->visible(fn (Booking $record): bool => filled($record->custom_fields))
+                    ->schema([
+                        RepeatableEntry::make('custom_fields')
+                            ->hiddenLabel()
+                            ->schema([
+                                TextEntry::make('label')
+                                    ->label('Campo'),
+                                TextEntry::make('value')
+                                    ->label('Respuesta')
+                                    ->formatStateUsing(fn (mixed $state): string => is_bool($state)
+                                        ? ($state ? 'Sí' : 'No')
+                                        : (string) $state),
+                            ])
+                            ->columns(2),
                     ]),
             ]);
     }

@@ -17,12 +17,14 @@ class ContactMessage extends Model
         'email',
         'phone',
         'message',
+        'custom_fields',
         'status',
         'responded_at',
         'converted_at',
     ];
 
     protected $casts = [
+        'custom_fields' => 'array',
         'responded_at' => 'datetime',
         'converted_at' => 'datetime',
     ];
